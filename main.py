@@ -2,6 +2,11 @@ from machine import Pin, I2C
 import ssd1306
 import time
 from machine import ADC
+## main.py
+## Author: Sandro Contreras II
+## License: MIT
+## Description: Monitors battery voltage and displays battery health via OLED.
+
 ## This file controls the Oled display
 ## Renamed file to "main.py" To boot file on power source
 
@@ -42,14 +47,14 @@ while True:
     percentage_int = int(percentage)
     percentage_str = str(percentage_int)
 
-    print("Floating ADC value: ", raw)
-    print("Battery Percentage Value: ", percentage_str, "%")
-    print("Previous Battery Voltage: ", previous_battery_voltage)
-    print("Current Battery Voltage: ", battery_voltage)
+    #print("Floating ADC value: ", raw)
+    #print("Battery Percentage Value: ", percentage_str, "%")
+    #print("Previous Battery Voltage: ", previous_battery_voltage)
+    #print("Current Battery Voltage: ", battery_voltage)
     
     ## Create Power Bank Interaction Signal
     ## The Oled will only display when the charging bank is Charging or Providing Charge
-    startTime = time.time()	# Start timing the battery voltage status
+    #startTime = time.time()	# Start timing the battery voltage status
     if (previous_battery_voltage < battery_voltage or previous_battery_voltage > battery_voltage):
         
         oled.fill(0)
@@ -65,6 +70,6 @@ while True:
     
     time.sleep(5)
     
-    endTime = time.time()	# End of battery voltage status
-    totalTime = endTime - startTime
-    print("Total time of Operation: ", totalTime)
+   # endTime = time.time()	# End of battery voltage status
+   # totalTime = endTime - startTime
+   # print("Total time of Operation: ", totalTime)
