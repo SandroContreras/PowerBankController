@@ -43,14 +43,44 @@ while True:
     ## Step 3: Use battery voltage to find Battery Charge Percentage
     
     ## Formula for converting voltage to Battery Health Percentage: Percentage = [(Actual Voltage - Minimum Voltage) / (Maximum Voltage - Minimum Voltage)] * 100
-    percentage = (((battery_voltage - 2.5)/(4.2 - 2.5)) * 100)
-    percentage_int = int(percentage)
-    percentage_str = str(percentage_int)
-
-    #print("Floating ADC value: ", raw)
-    #print("Battery Percentage Value: ", percentage_str, "%")
-    #print("Previous Battery Voltage: ", previous_battery_voltage)
-    #print("Current Battery Voltage: ", battery_voltage)
+        ## Save this code for future Fuel Guage Chips
+    #percentage = (((battery_voltage - 2.5)/(4.2 - 2.5)) * 100)
+    #percentage_int = int(percentage)
+    #percentage_str = str(percentage_int)
+    
+    battery_percentage = 95
+    
+    ## Create State of Charge Table
+    if 3.0 <= battery_voltage <= 3.10:
+        battery_percentage = 5
+    elif 3.10 <= battery_voltage <= 3.20:
+        battery_percentage = 7
+    elif 3.20 <= battery_voltage <= 3.30:
+        battery_percentage = 10
+    elif 3.30 <= battery_voltage <= 3.35:
+        battery_percentage = 13
+    elif 3.35 <= battery_voltage <= 3.40:
+        battery_percentage = 15
+    elif 3.40 <= battery_voltage <= 3.50:
+        battery_percentage = 20
+    elif 3.50 <= battery_voltage <= 3.55:
+        battery_percentage = 30
+    elif 3.55 <= battery_voltage <= 3.60:
+        battery_percentage = 40
+    elif 3.60 <= battery_voltage <= 3.70:
+        battery_percentage = 50
+    elif 3.70 <= battery_voltage <= 3.80:
+        battery_percentage = 60
+    elif 3.80 <= battery_voltage <= 3.90:
+        battery_percentage = 70
+    elif 3.90 <= battery_voltage <= 4.0:
+        battery_percentage = 80
+    elif 4.0 <= battery_voltage <= 4.1:
+        battery_percentage = 90
+    elif 4.1 <= battery_voltage <= 4.2:
+        battery_percentage = 100
+    
+    battery_percent_str = str(battery_percentage)
     
     ## Create Power Bank Interaction Signal
     ## The Oled will only display when the charging bank is Charging or Providing Charge
@@ -59,9 +89,10 @@ while True:
         
         oled.fill(0)
         oled.text("Battery: ", 0, 0)
-    ##oled.text(voltageStr, 65, 0)
         oled.text(percentSymbol, 80, 0)
-        oled.text(percentage_str, 65, 0)
+        oled.text(battery_percent_str, 65, 0)
+        #oled.text(percentage_str, 65, 0)
+        
         oled.show()
     else:		## If the power bank is idle then power off the oled
         oled.poweroff()
