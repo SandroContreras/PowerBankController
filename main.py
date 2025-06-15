@@ -37,7 +37,7 @@ while True:
     ## Step 2: Use Adc Voltage to find current Battery Voltage
     
     ## Battery Voltage = Adc Voltage * ((R1+R2) / R2)
-    ## R1 = 47k ohm, R2 = 10k ohm
+    ## R1 = 47k ohm, R2 = 100k ohm
     battery_voltage = adc_voltage * 1.47
     
     ## Step 3: Use battery voltage to find Battery Charge Percentage
