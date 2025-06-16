@@ -30,6 +30,12 @@ previous_battery_voltage = adc_voltage * 1.05
 
 percentSymbol = "%"
 
+BatteryVoltageArr = []
+movingAvg = []
+windowSize = 20
+i = 0
+total = 0
+SMA = 0
 while True:
     raw = adc.read_u16()	## Read a Raw analog value in the range 0 - 65535
     ## Step 1: Find Adc Voltage
@@ -79,7 +85,17 @@ while True:
         battery_percentage = 90
     elif 4.1 <= battery_voltage <= 4.2:
         battery_percentage = 100
+        
+    ## Use SMA to smoothen out the battery percentage
+    BatteryVoltageArr.append(battery_voltage)
     
+    if len(BatteryVoltageArr) == windowSize:	## Append to Array until window size is met
+        for num in BatteryVoltageArr:			## Sum up all  Array Values
+            total += num
+        SMA = total / windowSize
+        BatteryVoltageArr.pop(0)				## Remove the first Array Index Value
+        time.sleep(0.005)						## Delay for 5 ms
+     battery_voltage = SMA						## Now the battery_voltage is stable   
     battery_percent_str = str(battery_percentage)
     
     ## Create Power Bank Interaction Signal
@@ -100,7 +116,3 @@ while True:
     previous_battery_voltage = battery_voltage	## Update the lower bounds to avoid an always on state
     
     time.sleep(5)
-    
-   # endTime = time.time()	# End of battery voltage status
-   # totalTime = endTime - startTime
-   # print("Total time of Operation: ", totalTime)
