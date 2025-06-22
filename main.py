@@ -32,19 +32,24 @@ percentSymbol = "%"
 
 BatteryVoltageArr = []
 movingAvg = []
-windowSize = 20
+windowSize = 12 
 i = 0
 total = 0
 SMA = 0
 def BatteryVoltage_SMA():
-    if len(BatteryVoltageArr) == windowSize:	## Append to Array until window size is met
-        for num in BatteryVoltageArr:			## Sum up all  Array Values
-            total += num
-            SMA = total / windowSize
-    BatteryVoltageArr.pop(0)				## Remove the first Array Index Value
-    time.sleep(0.005)						## Delay for 5 ms
-    battery_voltage = SMA						## Now the battery_voltage is stable
-    return battery_voltage
+    print("Function triggered")
+    for item in BatteryVoltageArr:
+        print(item)
+    while i < len(BatteryVoltageArr) - windowSize + 1:	## Append to Array until window size is met
+        print("While statement triggered")
+        
+        window_average = round(sum(BatteryVoltageArr) / windowSize, 2)
+
+        movingAvg.append(battery_voltage)	## Store SMA in SMA array
+        print("SMA Battery Voltage:", battery_voltage)
+        BatteryVoltageArr.pop(0)
+
+        return battery_voltage
 
 def SOCtable(battery_voltage):
     ## Create State of Charge Table
@@ -97,9 +102,17 @@ def OledSignal(previous_battery_voltage, battery_voltage):
     if (previous_battery_voltage < battery_voltage or previous_battery_voltage > battery_voltage):
         
         oled.fill(0)
-        oled.text("Battery: ", 0, 0)
+        
         oled.text(percentSymbol, 80, 0)
         oled.text(battery_percent_str, 65, 0)
+        
+        # Create Battery Symbol
+        oled.rect(0, 0, 41, 10, 1)
+        oled.vline(10, 0, 10, 1)
+        oled.vline(20, 0, 10, 1)
+        oled.vline(30, 0, 10, 1)
+        oled.rect(41, 3, 3, 5, 1)	## Battery Terminal Symbol
+        
         oled.show()
     else:		## If the power bank is idle then power off the oled
         oled.poweroff()
@@ -120,7 +133,9 @@ while True:
     BatteryVoltageArr.append(battery_voltage)
 
     BatteryVoltage_SMA()
-    
+
+    #battery_voltage = BatteryVoltage_SMA()
+   
     SOCtable(battery_voltage)
      
     battery_percent_str = str(battery_percentage)
@@ -129,4 +144,4 @@ while True:
         
     previous_battery_voltage = battery_voltage	## Update the lower bounds to avoid an always on state
     
-    time.sleep(5)
+    time.sleep(0.5)
