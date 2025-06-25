@@ -36,7 +36,8 @@ windowSize = 12
 i = 0
 total = 0
 SMA = 0
-def BatteryVoltage_SMA():
+
+def BatteryVoltage_SMA(battery_voltage):
     print("Function triggered")
     for item in BatteryVoltageArr:
         print(item)
@@ -165,7 +166,7 @@ while True:
     ## Use SMA to smoothen out the battery percentage
     BatteryVoltageArr.append(battery_voltage)
 
-    battery_voltage = BatteryVoltage_SMA()
+    battery_voltage = BatteryVoltage_SMA(battery_voltage)
    
     SOCtable(battery_voltage)
      
