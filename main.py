@@ -44,12 +44,13 @@ def BatteryVoltage_SMA():
         print("While statement triggered")
         
         window_average = round(sum(BatteryVoltageArr) / windowSize, 2)
-
+        battery_voltage = window_average	## battery_voltage = SMA of Battery Voltages
+        
         movingAvg.append(battery_voltage)	## Store SMA in SMA array
         print("SMA Battery Voltage:", battery_voltage)
         BatteryVoltageArr.pop(0)
 
-        return battery_voltage
+    return battery_voltage
 
 def SOCtable(battery_voltage):
     ## Create State of Charge Table
