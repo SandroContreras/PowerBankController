@@ -165,9 +165,7 @@ while True:
     ## Use SMA to smoothen out the battery percentage
     BatteryVoltageArr.append(battery_voltage)
 
-    BatteryVoltage_SMA()
-
-    #battery_voltage = BatteryVoltage_SMA()
+    battery_voltage = BatteryVoltage_SMA()
    
     SOCtable(battery_voltage)
      
