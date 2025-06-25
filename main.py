@@ -103,9 +103,36 @@ def OledSignal(previous_battery_voltage, battery_voltage):
         
         oled.fill(0)
         
-        oled.text(percentSymbol, 80, 0)
-        oled.text(battery_percent_str, 65, 0)
+        if (battery_voltage >= 3.20):
+            ## Display Battery Percentage for Double Digit Value
+            oled.text(percentSymbol, 86, 4)
+            oled.text(battery_percent_str, 70, 4)
+        else:
+            ## Shift Percent Symbol inwards towards the Single Digit Value
+            oled.text(percentSymbol, 78, 4)
+            oled.text(battery_percent_str, 70, 4)
         
+        print("Previous Battery Voltage: ", previous_battery_voltage)
+        print("Current Battery Voltage: ", battery_voltage)
+        
+        ## The Charging symbol will only appear if the Bank is Charging
+        if (previous_battery_voltage < battery_voltage):
+            ## Create Charging Symbol
+            oled.vline(55, 0, 16, 1)
+            oled.hline(55, 6, 8, 1)	## Create horizontal line at halfway point at charging symbol
+            oled.line(62, 6, 55, 15, 1)
+            oled.hline(48, 9, 8, 1)	## Create horizontal line at halfway point at charging symbol
+            oled.line(55, 0, 47, 9, 1)
+            ## Inner Symbol Fillings
+            oled.fill_rect(52, 6, 5, 4, 1)
+            oled.fill_rect(55, 6, 4, 4, 1)
+            oled.fill_rect(53, 2, 2, 4, 1)
+            oled.fill_rect(49, 7, 12, 2, 1)
+            oled.fill_rect(55, 8, 4, 4, 1)
+            oled.fill_rect(59, 9, 1, 1, 1)
+            oled.fill_rect(56, 12, 1, 3, 1)
+            oled.fill_rect(51, 4, 3, 3, 1)
+            
         # Create Battery Symbol
         oled.rect(0, 0, 41, 10, 1)
         oled.vline(10, 0, 10, 1)
@@ -113,6 +140,8 @@ def OledSignal(previous_battery_voltage, battery_voltage):
         oled.vline(30, 0, 10, 1)
         oled.rect(41, 3, 3, 5, 1)	## Battery Terminal Symbol
         
+        ## Create if statements or perhaps match and case statements to dicate which inner battery quadrants to fill in depending on battery health levels
+            
         oled.show()
     else:		## If the power bank is idle then power off the oled
         oled.poweroff()
@@ -123,11 +152,14 @@ while True:
     adc_voltage = (raw * 3.3 / 65535)
     ## Step 2: Use Adc Voltage to find current Battery Voltage
     
+    ## Move the current Battery Voltage Reading into the While True Loop
+    ## Implement a Sleep() to delay previous current voltage readings and the current battery voltage readings
+    
     ## Battery Voltage = Adc Voltage * ((R1+R2) / R2)
     ## R1 = 47k ohm, R2 = 100k ohm
     battery_voltage = adc_voltage * 1.47
     
-    battery_percentage = 0
+    battery_percentage = 0		## Default percentage
     
     ## Use SMA to smoothen out the battery percentage
     BatteryVoltageArr.append(battery_voltage)
