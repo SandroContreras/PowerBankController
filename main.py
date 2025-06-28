@@ -25,7 +25,6 @@ BatteryVoltageArr = []
 movingAvg = []
 windowSize = 12 
 i = 0
-total = 0
 SMA = 0
 
 def PowerCalculator():						## Values 0 - 65535 represents voltages between 0V - 3.3V
@@ -146,13 +145,25 @@ def OledSignal(previous_battery_voltage, battery_voltage):
         ## Create if statements to dicate which inner battery quadrants to fill in depending on battery health levels
         if (3.0 <= battery_voltage <= 3.55):
             print("Filling up 1st quadrant of battery symbol")
+            oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
         elif (3.55 <= battery_voltage <= 3.70):
             print("Filling up 2nd quadrant of battery symbol")
+            oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
+            oled.fill_rect(12, 1, 8, 8, 1)		## Fill the 2nd quadrant
         elif (3.70 <= battery_voltage <= 4.0):
             print("Filling up 3rd quadrant of battery symbol")
+            oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
+            oled.fill_rect(12, 1, 8, 8, 1)		## Fill the 2nd quadrant
+            oled.fill_rect(22, 1, 8, 8, 1)		## Fill the 3rd quadrant
         elif (4.0 <= battery_voltage <= 4.2):
             print("Filling up 4th quadrant of battery symbol")
-            
+            oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
+            oled.fill_rect(12, 1, 8, 8, 1)		## Fill the 2nd quadrant
+            oled.fill_rect(22, 1, 8, 8, 1)		## Fill the 3rd quadrant
+            oled.fill_rect(32, 1, 8, 8, 1)		## Fill the last quadrant
+#         elif (battery_voltage == 4.2):
+#             print("Battery Full")
+#             oled.fill_rect(10, 1, 3, 3, 1)		## Fill the last quadrant
         oled.show()
     else:		## If the power bank is idle then power off the oled
         oled.poweroff()
