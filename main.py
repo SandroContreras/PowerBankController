@@ -18,15 +18,6 @@ oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 
 ## Create ADC object on an ADC pin
 adc = ADC(Pin(26))	## GPIO 26 on Pico is an ADC0 Pin
-## Values 0 - 65535 represents voltages between 0V - 3.3V
-raw = adc.read_u16()	## Read a Raw analog value in the range 0 - 65535
-
-adc_voltage = (raw * 3.3 / 65535)
-    ## Step 2: Use Adc Voltage to find current Battery Voltage
-    
-    ## Battery Voltage = Adc Voltage * ((R1+R2) / R2)
-    ## R1 = 2.2 k ohm, R2 = 47k ohm
-previous_battery_voltage = adc_voltage * 1.05
 
 percentSymbol = "%"
 
@@ -36,6 +27,15 @@ windowSize = 12
 i = 0
 total = 0
 SMA = 0
+
+def PowerCalculator():						## Values 0 - 65535 represents voltages between 0V - 3.3V
+    raw = adc.read_u16()					## Read a Raw analog value in the range 0 - 65535
+    print("Raw:", raw)
+    
+    adc_voltage = (raw * 3.3 / 65535)		## Step 1: Find Adc Voltage
+
+    battery_voltage = adc_voltage * 1.47 	## Battery Voltage = Adc Voltage * ((R1+R2) / R2)
+    return battery_voltage					## R1 = 47k ohm, R2 = 100k ohm
 
 def BatteryVoltage_SMA(battery_voltage):
     print("Function triggered")
@@ -55,6 +55,7 @@ def BatteryVoltage_SMA(battery_voltage):
 
 def SOCtable(battery_voltage):
     ## Create State of Charge Table
+    ######################################  TURN THIS INTO A BISECT + LOOKUP LIST FOR OPTIMIZATION ###########################################################################
     if 3.0 <= battery_voltage <= 3.10:
         battery_percentage = 5
         return battery_percentage
@@ -142,24 +143,24 @@ def OledSignal(previous_battery_voltage, battery_voltage):
         oled.vline(30, 0, 10, 1)
         oled.rect(41, 3, 3, 5, 1)	## Battery Terminal Symbol
         
-        ## Create if statements or perhaps match and case statements to dicate which inner battery quadrants to fill in depending on battery health levels
+        ## Create if statements to dicate which inner battery quadrants to fill in depending on battery health levels
+        if (3.0 <= battery_voltage <= 3.55):
+            print("Filling up 1st quadrant of battery symbol")
+        elif (3.55 <= battery_voltage <= 3.70):
+            print("Filling up 2nd quadrant of battery symbol")
+        elif (3.70 <= battery_voltage <= 4.0):
+            print("Filling up 3rd quadrant of battery symbol")
+        elif (4.0 <= battery_voltage <= 4.2):
+            print("Filling up 4th quadrant of battery symbol")
             
         oled.show()
     else:		## If the power bank is idle then power off the oled
         oled.poweroff()
         
 while True:
-    raw = adc.read_u16()	## Read a Raw analog value in the range 0 - 65535
-    ## Step 1: Find Adc Voltage
-    adc_voltage = (raw * 3.3 / 65535)
-    ## Step 2: Use Adc Voltage to find current Battery Voltage
-    
-    ## Move the current Battery Voltage Reading into the While True Loop
-    ## Implement a Sleep() to delay previous current voltage readings and the current battery voltage readings
-    
-    ## Battery Voltage = Adc Voltage * ((R1+R2) / R2)
-    ## R1 = 47k ohm, R2 = 100k ohm
-    battery_voltage = adc_voltage * 1.47
+    previous_battery_voltage = PowerCalculator()
+    time.sleep(0.5)							# Add a delay between readings for comparison
+    battery_voltage = PowerCalculator()
     
     battery_percentage = 0		## Default percentage
     
@@ -175,5 +176,3 @@ while True:
     OledSignal(previous_battery_voltage, battery_voltage)
         
     previous_battery_voltage = battery_voltage	## Update the lower bounds to avoid an always on state
-    
-    time.sleep(0.5)
