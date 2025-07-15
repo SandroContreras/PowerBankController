@@ -1,11 +1,10 @@
-i = 0
-SMA = 0
-battery_percentage = 0		## Default percentage
-raw = 0
-adc_voltage = 0
-window_average = 0
-previous_battery_voltage = 0
-battery_voltage = 0
+from machine import Pin, I2C
+import ssd1306
+import time
+from machine import ADC
+
+## Create ADC object on an ADC pin
+adc = ADC(Pin(26))	## GPIO 26 on Pico is an ADC0 Pin
 class BatteryManager:
     def __init__(self, raw, adc_voltage, i, SMA, window_average, battery_voltage, battery_percentage):
         self.raw = raw
@@ -25,13 +24,10 @@ class BatteryManager:
     def PowerCalculator(self):						## Values 0 - 65535 represents voltages between 0V - 3.3V
         self.raw = adc.read_u16()					## Read a Raw analog value in the range 0 - 65535
 
-        self.adc_voltage = (raw * 3.3 / 65535)		## Step 1: Find Adc Voltage
+        self.adc_voltage = (self.raw * 3.3 / 65535)		## Step 1: Find Adc Voltage
 
         self.battery_voltage = self.adc_voltage * 1.47 	## Battery Voltage = Adc Voltage * ((R1+R2) / R2)
         return self.battery_voltage					## R1 = 47k ohm, R2 = 100k ohm
-
-#     def	BatteryVoltageArrAppender(self.battery_voltage):
-#         self.BatteryVoltageArr.append(self.battery_voltage)
 
     def BatteryVoltage_SMA(self, battery_voltage):
         print("Function triggered")
@@ -98,9 +94,15 @@ class BatteryManager:
             self.battery_percentage = 100
             return self.battery_percentage
 
-class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Class
-    def __init__(self, previous_battery_voltage, battery_percent_str, oled):
-        super().__init__(raw, adc_voltage, i, SMA, window_average, battery_voltage, battery_percentage)
+class OledUI(BatteryManager):		## Inherit the variables from	 BatteryManager Class
+    def __init__(self, previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage):
+        dummy_raw = 0
+        dummy_i = 0
+        dummy_SMA = 0
+        dummy_window_average = 0
+        dummy_adc_voltage = 0
+        
+        super().__init__(dummy_raw, dummy_adc_voltage, dummy_i, dummy_SMA, dummy_window_average, battery_voltage, battery_percentage)		## I only need battery_voltage, battery_percentage
         self.battery_percent_str = battery_percent_str
         self.oled = oled
         self.previous_battery_voltage = previous_battery_voltage

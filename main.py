@@ -2,7 +2,7 @@ from machine import Pin, I2C
 import ssd1306
 import time
 from machine import ADC
-from PowerBank import BatteryManager
+from PowerBank import BatteryManager, OledUI
 ## main.py
 ## Author: Sandro Contreras II
 ## License: MIT
@@ -26,18 +26,18 @@ battery_percent_str = ""
 # BatteryVoltageArr = []
 # movingAvg = []
 #windowSize = 12 
-# i = 0
-# SMA = 0
-# battery_percentage = 0		## Default percentage
-# raw = 0
-# adc_voltage = 0
-# window_average = 0
-# previous_battery_voltage = 0
-# battery_voltage = 0
+i = 0
+SMA = 0
+battery_percentage = 0		## Default percentage
+raw = 0
+adc_voltage = 0
+window_average = 0
+previous_battery_voltage = 0
+battery_voltage = 0
 
         
 BatteryMethods = BatteryManager(raw, adc_voltage, i, SMA, window_average, battery_voltage, battery_percentage)
-OledMethods = OledUI(previous_battery_voltage, battery_percent_str, oled)
+OledMethods = OledUI(previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage)
 while True:
     
     previous_battery_voltage = BatteryMethods.PowerCalculator()
