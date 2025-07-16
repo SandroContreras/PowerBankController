@@ -46,7 +46,7 @@ while True:
     battery_percent_str = str(battery_percentage)
     
     OledMethods.OledSignal(previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str)
-    time.sleep(5)
+
     ## Use SMA to smoothen out the battery percentage
     BatteryMethods.AppendArray(battery_voltage)
 
