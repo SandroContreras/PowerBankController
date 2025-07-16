@@ -3,7 +3,6 @@ import ssd1306
 import time
 from machine import ADC
 
-
 ## Create ADC object on an ADC pin
 adc = ADC(Pin(26))	## GPIO 26 on Pico is an ADC0 Pin
 class BatteryManager:
@@ -28,21 +27,21 @@ class BatteryManager:
         self.adc_voltage = (self.raw * 3.3 / 65535)		## Step 1: Find Adc Voltage
 
         self.battery_voltage = self.adc_voltage * 1.47 	## Battery Voltage = Adc Voltage * ((R1+R2) / R2)
-        print("Calculated Battery Voltage: ", self.battery_voltage)
+        #print("Calculated Battery Voltage: ", self.battery_voltage)
         return self.battery_voltage					## R1 = 47k ohm, R2 = 100k ohm
 
     def BatteryVoltage_SMA(self, battery_voltage):
-        print("Function triggered")
-        for item in self.BatteryVoltageArr:
-            print("Voltages in Battery Voltage Array: ", item)
+        #print("Function triggered")
+        #for item in self.BatteryVoltageArr:
+            #print("Voltages in Battery Voltage Array: ", item)
         while self.i < len(self.BatteryVoltageArr) - self.windowSize + 1:	## Append to Array until window size is met
-            print("While statement triggered")
+            #print("While statement triggered")
             
             self.window_average = round(sum(self.BatteryVoltageArr) / self.windowSize, 2)
             self.battery_voltage = self.window_average	## battery_voltage = SMA of Battery Voltages
             
             self.movingAvg.append(self.battery_voltage)	## Store SMA in SMA array
-            print("SMA Battery Voltage:", self.battery_voltage)
+            #print("SMA Battery Voltage:", self.battery_voltage)
             self.BatteryVoltageArr.pop(0)
 
         return self.battery_voltage
@@ -81,7 +80,7 @@ class BatteryManager:
         elif 4.1 <= battery_voltage <= 4.2:
             return 100
 
-class OledUI(BatteryManager):		## Inherit the variables from	 BatteryManager Class
+class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Class
     def __init__(self, previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage):
         dummy_raw = 0
         dummy_i = 0
@@ -90,9 +89,7 @@ class OledUI(BatteryManager):		## Inherit the variables from	 BatteryManager Cla
         dummy_adc_voltage = 0
         
         super().__init__(dummy_raw, dummy_adc_voltage, dummy_i, dummy_SMA, dummy_window_average, battery_voltage, battery_percentage)		## I only need variables: battery_voltage, battery_percentage from parent class
-        self.battery_percent_str = battery_percent_str
         self.oled = oled
-        #self.previous_battery_voltage = previous_battery_voltage
         self.percentSymbol = "%"
     def variableUpdater(self, previous_battery_voltage, battery_voltage):
         self.previous_battery_voltage = self.battery_voltage
@@ -100,9 +97,9 @@ class OledUI(BatteryManager):		## Inherit the variables from	 BatteryManager Cla
     def OledSignal(self, previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str):
     ## Create Power Bank Interaction Signal
     ## The Oled will only display when the charging bank is Charging or Providing Charge
-        #if (3.81 <= self.battery_voltage <= 3.83):
-        print("previous_battery_voltage value in OledSignal: ", previous_battery_voltage)
-        print("battery_voltage value in OledSignal: ", battery_voltage)
+  
+        #print("previous_battery_voltage value in OledSignal: ", previous_battery_voltage)
+        #print("battery_voltage value in OledSignal: ", battery_voltage)
         if (previous_battery_voltage < battery_voltage or previous_battery_voltage > battery_voltage):
         
             self.oled.fill(0)
@@ -110,31 +107,32 @@ class OledUI(BatteryManager):		## Inherit the variables from	 BatteryManager Cla
             self.oled.text("Power Bank", 20, 40, 1)
 
             if (battery_voltage >= 3.20):
+                print("battery_percent_str value: ", battery_percent_str)
                 ## Display Battery Percentage for Double Digit Value
-                self.oled.text(self.percentSymbol, 86, 4)
-                self.oled.text(self.battery_percent_str, 70, 4)
+                self.oled.text(self.percentSymbol, 65, 0)
+                self.oled.text(battery_percent_str, 50, 0)
             else:
                 ## Shift Percent Symbol inwards towards the Single Digit Value
-                self.oled.text(percentSymbol, 78, 4)
-                self.oled.text(self.battery_percent_str, 70, 4)
-        
+                self.oled.text(self.percentSymbol, 121, 4)
+                self.oled.text(battery_percent_str, 110, 4)
+            
             ## The Charging symbol will only appear if the Bank is Charging
             if (previous_battery_voltage < battery_voltage):
                 ## Create Charging Symbol
-                self.oled.vline(55, 0, 16, 1)
-                self.oled.hline(55, 6, 8, 1)	## Create horizontal line at halfway point at charging symbol
-                self.oled.line(62, 6, 55, 15, 1)
-                self.oled.hline(48, 9, 8, 1)	## Create horizontal line at halfway point at charging symbol
-                self.oled.line(55, 0, 47, 9, 1)
+                self.oled.vline(85, 0, 16, 1)
+                self.oled.hline(85, 6, 8, 1)	## Create horizontal line at halfway point at charging symbol
+#                 self.oled.line(92, 6, 85, 15, 1)		## Implement Line if Sharper Look is Perferred
+                self.oled.hline(78, 9, 8, 1)	## Create horizontal line at halfway point at charging symbol
+#                 self.oled.line(85, 0, 77, 9, 1)		## Implement Line if Sharper Look is Perferred
                 ## Inner Symbol Fillings
-                self.oled.fill_rect(52, 6, 5, 4, 1)
-                self.oled.fill_rect(55, 6, 4, 4, 1)
-                self.oled.fill_rect(53, 2, 2, 4, 1)
-                self.oled.fill_rect(49, 7, 12, 2, 1)
-                self.oled.fill_rect(55, 8, 4, 4, 1)
-                self.oled.fill_rect(59, 9, 1, 1, 1)
-                self.oled.fill_rect(56, 12, 1, 3, 1)
-                self.oled.fill_rect(51, 4, 3, 3, 1)
+                self.oled.fill_rect(82, 6, 5, 4, 1)
+                self.oled.fill_rect(85, 6, 4, 4, 1)
+                self.oled.fill_rect(83, 2, 2, 4, 1)
+                self.oled.fill_rect(79, 7, 12, 2, 1)
+                self.oled.fill_rect(85, 8, 4, 4, 1)
+                self.oled.fill_rect(89, 9, 1, 1, 1)
+                self.oled.fill_rect(86, 12, 1, 3, 1)
+                self.oled.fill_rect(81, 4, 3, 3, 1)
                 
             # Create Battery Symbol
             self.oled.rect(0, 0, 41, 10, 1)
