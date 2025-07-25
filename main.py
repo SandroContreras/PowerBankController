@@ -23,9 +23,6 @@ adc = ADC(Pin(26))	## GPIO 26 on Pico is an ADC0 Pin
 percentSymbol = "%"
 battery_percent_str = ""
 
-# BatteryVoltageArr = []
-# movingAvg = []
-#windowSize = 12 
 i = 0
 SMA = 0
 battery_percentage = 0		## Default percentage
@@ -34,22 +31,27 @@ adc_voltage = 0
 window_average = 0
 previous_battery_voltage = 0
 battery_voltage = 0
-
+time_update = 0
         
 BatteryMethods = BatteryManager(raw, adc_voltage, i, SMA, window_average, battery_voltage, battery_percentage)
-OledMethods = OledUI(previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage)
+OledMethods = OledUI(previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update)
 while True:
     
     previous_battery_voltage = BatteryMethods.PowerCalculator()
     time.sleep(0.5)							# Add a delay between readings for comparison
     battery_voltage = BatteryMethods.PowerCalculator()
     
+#     battery_percentage = BatteryMethods.SOCtable(battery_voltage)
+#      
+#     battery_percent_str = str(battery_percentage)
+#     
+#     OledMethods.OledSignal(previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str)
+
     ## Use SMA to smoothen out the battery percentage
     BatteryMethods.AppendArray(battery_voltage)
-    #BatteryVoltageArr.append(battery_voltage)
 
     battery_voltage = BatteryMethods.BatteryVoltage_SMA(battery_voltage)
-   
+    
     battery_percentage = BatteryMethods.SOCtable(battery_voltage)
      
     battery_percent_str = str(battery_percentage)
