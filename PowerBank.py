@@ -41,7 +41,7 @@ class BatteryManager:
             self.battery_voltage = self.window_average	## battery_voltage = SMA of Battery Voltages
             
             self.movingAvg.append(self.battery_voltage)	## Store SMA in SMA array
-            print("SMA Battery Voltage:", self.battery_voltage)
+            #print("SMA Battery Voltage:", self.battery_voltage)
             self.BatteryVoltageArr.pop(0)
 
         return self.battery_voltage
@@ -82,6 +82,7 @@ class BatteryManager:
 
 class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Class
     def __init__(self, previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update):
+
         dummy_raw = 0
         dummy_i = 0
         dummy_SMA = 0
@@ -93,6 +94,7 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
         self.percentSymbol = "%"
         self.time = 500
         self.time_update = 0
+ 
     def variableUpdater(self, previous_battery_voltage, battery_voltage):
         self.previous_battery_voltage = self.battery_voltage
     
