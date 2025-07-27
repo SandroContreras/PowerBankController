@@ -1,6 +1,7 @@
 from machine import Pin, I2C
 import ssd1306
 import time
+import bisect
 from machine import ADC
 from PowerBank import BatteryManager, OledUI
 ## main.py
@@ -35,7 +36,6 @@ time_update = 0
         
 BatteryMethods = BatteryManager(raw, adc_voltage, i, SMA, window_average, battery_voltage, battery_percentage)
 OledMethods = OledUI(previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update)
-
 while True:
     
     previous_battery_voltage = BatteryMethods.PowerCalculator()
@@ -52,16 +52,11 @@ while True:
     BatteryMethods.AppendArray(battery_voltage)
 
     battery_voltage = BatteryMethods.BatteryVoltage_SMA(battery_voltage)
-
+    
     battery_percentage = BatteryMethods.SOCtable(battery_voltage)
      
     battery_percent_str = str(battery_percentage)
     
     OledMethods.OledSignal(previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str)
-
-    ## Use SMA to smoothen out the battery percentage
-    BatteryMethods.AppendArray(battery_voltage)
-
-    battery_voltage = BatteryMethods.BatteryVoltage_SMA(battery_voltage)
     
     OledMethods.variableUpdater(previous_battery_voltage, battery_voltage)	# Update the lower bounds to avoid an always on state

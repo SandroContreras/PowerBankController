@@ -1,6 +1,7 @@
 from machine import Pin, I2C
 import ssd1306
 import time
+import bisect
 from machine import ADC
 
 ## Create ADC object on an ADC pin
@@ -41,7 +42,7 @@ class BatteryManager:
             self.battery_voltage = self.window_average	## battery_voltage = SMA of Battery Voltages
             
             self.movingAvg.append(self.battery_voltage)	## Store SMA in SMA array
-            #print("SMA Battery Voltage:", self.battery_voltage)
+            print("SMA Battery Voltage:", self.battery_voltage)
             self.BatteryVoltageArr.pop(0)
 
         return self.battery_voltage
@@ -51,38 +52,42 @@ class BatteryManager:
     #output       = [       5,   7,  10]
     ## Create State of Charge Table
     ######################################  TURN THIS INTO A BISECT + LOOKUP LIST FOR OPTIMIZATION ###########################################################################
-        if 3.0 <= battery_voltage <= 3.10:
-            return 5
-        elif 3.10 <= battery_voltage <= 3.20:
-            return 7
-        elif 3.20 <= battery_voltage <= 3.30:
-            return 10
-        elif 3.30 <= battery_voltage <= 3.35:
-            return 13
-        elif 3.35 <= battery_voltage <= 3.40:
-            return 15
-        elif 3.40 <= battery_voltage <= 3.50:
-            return 20
-        elif 3.50 <= battery_voltage <= 3.55:
-            return 30
-        elif 3.55 <= battery_voltage <= 3.60:
-            return 40
-        elif 3.60 <= battery_voltage <= 3.70:
-            return 50
-        elif 3.70 <= battery_voltage <= 3.80:
-            return 60
-        elif 3.80 <= battery_voltage <= 3.90:
-            return 70
-        elif 3.90 <= battery_voltage <= 4.0:
-            return 80
-        elif 4.0 <= battery_voltage <= 4.1:
-            return 90
-        elif 4.1 <= battery_voltage <= 4.2:
-            return 100
+#         if 3.0 <= battery_voltage <= 3.10:
+#             return 5
+#         elif 3.10 <= battery_voltage <= 3.20:
+#             return 7
+#         elif 3.20 <= battery_voltage <= 3.30:
+#             return 10
+#         elif 3.30 <= battery_voltage <= 3.35:
+#             return 13
+#         elif 3.35 <= battery_voltage <= 3.40:
+#             return 15
+#         elif 3.40 <= battery_voltage <= 3.50:
+#             return 20
+#         elif 3.50 <= battery_voltage <= 3.55:
+#             return 30
+#         elif 3.55 <= battery_voltage <= 3.60:
+#             return 40
+#         elif 3.60 <= battery_voltage <= 3.70:
+#             return 50
+#         elif 3.70 <= battery_voltage <= 3.80:
+#             return 60
+#         elif 3.80 <= battery_voltage <= 3.90:
+#             return 70
+#         elif 3.90 <= battery_voltage <= 4.0:
+#             return 80
+#         elif 4.0 <= battery_voltage <= 4.1:
+#             return 90
+#         elif 4.1 <= battery_voltage <= 4.2:
+#             return 100
+
+        VoltageRange = [3.0, 3.1, 3.2, 3.3, 3.35, 3.4, 3.55, 3.6, 3.7, 3.8, 3.9, 4.0, 4.1, 4.2]
+        Percentage = [5, 7, 10, 13, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+        Index =  bisect.bisect_left(VoltageRange, battery_voltage)
+        return Percentage[Index]
 
 class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Class
     def __init__(self, previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update):
-
         dummy_raw = 0
         dummy_i = 0
         dummy_SMA = 0
@@ -94,7 +99,6 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
         self.percentSymbol = "%"
         self.time = 500
         self.time_update = 0
- 
     def variableUpdater(self, previous_battery_voltage, battery_voltage):
         self.previous_battery_voltage = self.battery_voltage
     
