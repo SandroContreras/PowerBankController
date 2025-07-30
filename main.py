@@ -26,7 +26,7 @@ battery_percent_str = ""
 
 i = 0
 SMA = 0
-battery_percentage = 0		## Default percentage
+battery_percentage = 0
 raw = 0
 adc_voltage = 0
 window_average = 0
@@ -41,12 +41,6 @@ while True:
     previous_battery_voltage = BatteryMethods.PowerCalculator()
     time.sleep(0.5)							# Add a delay between readings for comparison
     battery_voltage = BatteryMethods.PowerCalculator()
-    
-#     battery_percentage = BatteryMethods.SOCtable(battery_voltage)
-#      
-#     battery_percent_str = str(battery_percentage)
-#     
-#     OledMethods.OledSignal(previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str)
 
     ## Use SMA to smoothen out the battery percentage
     BatteryMethods.AppendArray(battery_voltage)

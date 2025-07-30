@@ -30,56 +30,32 @@ class BatteryManager:
         self.battery_voltage = self.adc_voltage * 1.47 	## Battery Voltage = Adc Voltage * ((R1+R2) / R2)
         #print("Calculated Battery Voltage: ", self.battery_voltage)
         return self.battery_voltage					## R1 = 47k ohm, R2 = 100k ohm
-
+    
+    def SetWindowSize(self, battery_voltage):		## Lithium batteries don't charge linearly
+        if self.battery_voltage < 3.9:				## Reduce greater noise before 3.9 V with large SMA window
+            #print("Window Size = 60")
+            self.windowSize = 60
+        else:										## Less Noise beyond 3.9V so reduce SMA window
+            #print("Window Size = 12")
+            self.windowSize = 12
+            
+        return self.windowSize
     def BatteryVoltage_SMA(self, battery_voltage):
-        #print("Function triggered")
-        #for item in self.BatteryVoltageArr:
-            #print("Voltages in Battery Voltage Array: ", item)
+        self.SetWindowSize(self.battery_voltage)
+#         for item in self.BatteryVoltageArr:
+#             print("Voltages in Battery Voltage Array: ", item)
         while self.i < len(self.BatteryVoltageArr) - self.windowSize + 1:	## Append to Array until window size is met
-            #print("While statement triggered")
             
             self.window_average = round(sum(self.BatteryVoltageArr) / self.windowSize, 2)
             self.battery_voltage = self.window_average	## battery_voltage = SMA of Battery Voltages
             
             self.movingAvg.append(self.battery_voltage)	## Store SMA in SMA array
-            print("SMA Battery Voltage:", self.battery_voltage)
+            #print("SMA Battery Voltage:", self.battery_voltage)
             self.BatteryVoltageArr.pop(0)
 
         return self.battery_voltage
     
     def SOCtable(self, battery_voltage):
-    #VoltageRange = [3.0, 3.1, 3.2, 3.3]		## Range of voltages
-    #output       = [       5,   7,  10]
-    ## Create State of Charge Table
-    ######################################  TURN THIS INTO A BISECT + LOOKUP LIST FOR OPTIMIZATION ###########################################################################
-#         if 3.0 <= battery_voltage <= 3.10:
-#             return 5
-#         elif 3.10 <= battery_voltage <= 3.20:
-#             return 7
-#         elif 3.20 <= battery_voltage <= 3.30:
-#             return 10
-#         elif 3.30 <= battery_voltage <= 3.35:
-#             return 13
-#         elif 3.35 <= battery_voltage <= 3.40:
-#             return 15
-#         elif 3.40 <= battery_voltage <= 3.50:
-#             return 20
-#         elif 3.50 <= battery_voltage <= 3.55:
-#             return 30
-#         elif 3.55 <= battery_voltage <= 3.60:
-#             return 40
-#         elif 3.60 <= battery_voltage <= 3.70:
-#             return 50
-#         elif 3.70 <= battery_voltage <= 3.80:
-#             return 60
-#         elif 3.80 <= battery_voltage <= 3.90:
-#             return 70
-#         elif 3.90 <= battery_voltage <= 4.0:
-#             return 80
-#         elif 4.0 <= battery_voltage <= 4.1:
-#             return 90
-#         elif 4.1 <= battery_voltage <= 4.2:
-#             return 100
 
         VoltageRange = [3.0, 3.1, 3.2, 3.3, 3.35, 3.4, 3.55, 3.6, 3.7, 3.8, 3.9, 4.0, 4.1, 4.2]
         Percentage = [5, 7, 10, 13, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100]
@@ -105,9 +81,6 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
     def OledSignal(self, previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str):
     ## Create Power Bank Interaction Signal
     ## The Oled will only display when the charging bank is Charging or Providing Charge
-  
-        #print("previous_battery_voltage value in OledSignal: ", previous_battery_voltage)
-        #print("battery_voltage value in OledSignal: ", battery_voltage)
         if (previous_battery_voltage < battery_voltage or previous_battery_voltage > battery_voltage):
         
             self.oled.fill(0)
