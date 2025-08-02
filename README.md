@@ -1,5 +1,5 @@
 # Power Bank Controller
-MicroPython code to control an Oled Display monitoring Battery Health
+MicroPython code to control an OLED display that monitors battery health.
 
 **Link to Project:** *Coming Soon*
 *(This project is a work in progress)*
