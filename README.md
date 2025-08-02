@@ -1,7 +1,8 @@
 # Power Bank Controller
 MicroPython code to control an Oled Display monitoring Battery Health
 
-**Link to Project: http://future-live-demo.com/**
+**Link to Project:** *Coming Soon*
+*(This project is a work in progress)*
 
 ## How It's Made
 **Tech Used:** MicroPython, Raspberry Pi Pico, SSD1306 OLED Display
@@ -9,16 +10,19 @@ MicroPython code to control an Oled Display monitoring Battery Health
 Eight 18650 batteries are wired in parallel to a boost converter charging module. The charging module powers the Pico Board and the OLED Display. To achieve battery health displays a voltage divider is used to safely bring down the voltage towards an ADC pin. The display is programmed to display the reported battery health percentage for the user. 
 
 ## Optimizations
-I will talk about how wiring schemes were improved and practical design ideas
+Will cover:
+- Improved wiring layout
+- Practical design refinements
+- Considerations for safety and reliability
 
 ## Lessons Learned
-This was my first time soldering. I quickly learned the soldering process through soldering the Battery Case Holders to the Charging Module. This project has taught me to appreciate the use of Solder Flux for creating superior solder and for desoldering. 
+This was my first time soldering. I quickly learned the soldering process through soldering the Battery Case Holders to the Charging Module. This project also taught me the importance of solder flux, both for creating clean joints and for desoldering.
 
 ## Data Flow
-I will include a Diagram of how Pico and OLED displays battery Health with ADC pin 26
+A diagram showing how the Pico and OLED handle battery health via ADC (Pin 26) is planned.
 
 ## Circuit Diagram
-A Circuit Diagram will be included soon.
+A full schematic will be added soon.
 
 ## Included Modules
 - 'bisect.py' - From the Python Standard Library (CPython 3.13)
