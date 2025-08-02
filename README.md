@@ -19,4 +19,3 @@ I will include a Diagram of how Pico and OLED displays battery Health with ADC p
 
 ## Circuit Diagram
 A Circuit Diagram will be included soon.
-## License
