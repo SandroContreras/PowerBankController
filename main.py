@@ -7,10 +7,10 @@ from PowerBank import BatteryManager, OledUI
 ## main.py
 ## Author: Sandro Contreras II
 ## License: MIT
-## Description: Monitors battery voltage and displays battery health via OLED.
-
-## This file controls the Oled display
-## Renamed file to "main.py" To boot file on power source
+## Description: Monitors battery voltage and displays battery health
+##				using an OlED screen through modular method calls.
+## Notes:
+## - Named file "main.py" to follow MicroPython auto-run feature
 
 # Initialize I2C
 i2c = I2C(0, scl=Pin(5), sda=Pin(4))
