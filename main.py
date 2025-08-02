@@ -11,6 +11,9 @@ from PowerBank import BatteryManager, OledUI
 ##				using an OlED screen through modular method calls.
 ## Notes:
 ## - Named file "main.py" to follow MicroPython auto-run feature
+## - This library (ssd1306.py) was manually downloaded from:
+##   https://gist.github.com/cwyark/d7f2becd84b0b69b05a83315bf84c467
+## Not included in repo due to license uncertainty.
 
 # Initialize I2C
 i2c = I2C(0, scl=Pin(5), sda=Pin(4))
@@ -53,4 +56,5 @@ while True:
     
     OledMethods.OledSignal(previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str)
     
+
     OledMethods.variableUpdater(previous_battery_voltage, battery_voltage)	# Update the lower bounds to avoid an always on state
