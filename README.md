@@ -19,3 +19,8 @@ I will include a Diagram of how Pico and OLED displays battery Health with ADC p
 
 ## Circuit Diagram
 A Circuit Diagram will be included soon.
+
+## Included Modules
+- 'bisect.py' - From the Python Standard Library (CPython 3.13)
+- Source: https://github.com/python/cpython
+- License: Python Software Foundation License (PSF)
