@@ -7,6 +7,10 @@
 ## - Includes modular methods for power evaluation using voltage divider math
 ##	 and a Simple Moving Average (SMA) for smoothing. 
 ## - Designed to be utilized by main.py as a backend.
+## - This library (ssd1306.py) was manually downloaded from:
+##   https://gist.github.com/cwyark/d7f2becd84b0b69b05a83315bf84c467
+## Not included in repo due to license uncertainty.
+
 from machine import Pin, I2C
 import ssd1306
 import time
@@ -178,4 +182,5 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
             print("Power Stagnation Triggered! Clearing Display!")
             #self.oled.poweroff()
             self.oled.fill(0)
+
             self.oled.show()
