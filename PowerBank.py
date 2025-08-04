@@ -9,7 +9,7 @@
 ## - Designed to be utilized by main.py as a backend.
 ## - This library (ssd1306.py) was manually downloaded from:
 ##   https://gist.github.com/cwyark/d7f2becd84b0b69b05a83315bf84c467
-## Not included in repo due to license uncertainty.
+##   Not included in repo due to license uncertainty.
 
 from machine import Pin, I2C
 import ssd1306
@@ -184,3 +184,4 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
             self.oled.fill(0)
 
             self.oled.show()
+
