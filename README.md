@@ -24,6 +24,7 @@ A diagram showing how the Pico processes battery voltage and displays SoC info o
 <p align="center">
     <img width="33%" src="images/pico_battery_data_flow.svg" alt = "Data Flowchart">
 </p>
+<p align="center"><em>Figure 1: Data flow from ADC voltage reading to OLED UI output.</em></p>
 
 ## Circuit Diagram
 A full schematic will be added soon.
