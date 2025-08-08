@@ -7,10 +7,6 @@
 ## - Includes modular methods for power evaluation using voltage divider math
 ##	 and a Simple Moving Average (SMA) for smoothing. 
 ## - Designed to be utilized by main.py as a backend.
-## - This library (ssd1306.py) was manually downloaded from:
-##   https://gist.github.com/cwyark/d7f2becd84b0b69b05a83315bf84c467
-##   Not included in repo due to license uncertainty.
-
 from machine import Pin, I2C
 import ssd1306
 import time
@@ -54,8 +50,8 @@ class BatteryManager:
     def BatteryVoltage_SMA(self, battery_voltage):
         self.SetWindowSize(self.battery_voltage)
         print("Window Size: ", self.windowSize)
-#         for item in self.BatteryVoltageArr:
-#             print("Voltages in Battery Voltage Array: ", item)
+        for item in self.BatteryVoltageArr:
+            print("Voltages in Battery Voltage Array: ", item)
         while self.i < len(self.BatteryVoltageArr) - self.windowSize + 1:	## Append to Array until window size is met
             
             self.window_average = round(sum(self.BatteryVoltageArr) / self.windowSize, 2)
@@ -148,40 +144,51 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
             self.oled.fill_rect(22, 1, 8, 8, 1)		## Fill the 3rd quadrant
             self.oled.fill_rect(32, 1, 8, 8, 1)		## Fill the last quadrant
     
+    def BootMSG(self):
+        self.oled.fill(0)
+        self.oled.text("Booting", 34, 30, 1)		## Boot MSG
+        self.oled.text("PowerCell...", 25, 40, 1)
+        self.oled.show()
+    
     ## ADD LOGIC THAT ONLY ALLOWS SCREEN UPDATES ONCE WINDOW SIZE EQUALS 60 OR 12
     def OledSignal(self, previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str):
         #self.GetPowerDifference()
         self.GetPowerDifference(previous_battery_voltage, battery_voltage)
         DifferenceBool = self.CheckPowerThreshold(previous_battery_voltage, battery_voltage)
         print("Difference Bool State: ", DifferenceBool)
-    ## Create Power Bank Interaction Signal
-    ## The Oled will only display when the charging bank is Charging or Providing Charge
-        if ((previous_battery_voltage < battery_voltage or previous_battery_voltage > battery_voltage) and DifferenceBool):
         
-            self.oled.fill(0)
-            self.oled.text("Sandro's", 30, 30, 1)		## Signature
-            self.oled.text("Power Bank", 20, 40, 1)
-            
-            self.DrawBatteryPercentage(battery_voltage, percentSymbol, battery_percent_str)
-            
-            self.DrawChargingSymbol(previous_battery_voltage, battery_voltage)
-                
-            # Create Battery Symbol
-            self.oled.rect(0, 0, 41, 10, 1)
-            self.oled.vline(10, 0, 10, 1)
-            self.oled.vline(20, 0, 10, 1)
-            self.oled.vline(30, 0, 10, 1)
-            self.oled.rect(41, 3, 3, 5, 1)	## Battery Terminal Symbol
-        
-            self.FillBatteryQuadrants(battery_voltage)
-            
-            self.oled.show()
-        ## ADD LOGIC THAT CLEARS DISPLAY ONCE BATTERY PERCENTAGE IS THE SAME FOR 6 SECONDS (IDLE POWER BANK LOGIC)
-        #elif (battery_percent_str == battery_percent_str):		## If the power bank is idle then power off the oled
+        if len(self.BatteryVoltageArr) != self.SetWindowSize(self.battery_voltage):
+            print("Entering Boot MSG")
+            self.BootMSG()
+            print("Length of Battery Voltage Array: ", len(self.BatteryVoltageArr))
         else:
-            print("Power Stagnation Triggered! Clearing Display!")
-            #self.oled.poweroff()
-            self.oled.fill(0)
-
-            self.oled.show()
-
+        ## if battery_voltage arr == 60 or 12
+            ## Create Power Bank Interaction Signal
+            ## The Oled will only display when the charging bank is Charging or Providing Charge
+            if ((previous_battery_voltage < battery_voltage or previous_battery_voltage > battery_voltage) and DifferenceBool):
+            
+                self.oled.fill(0)
+                self.oled.text("Sandro's", 30, 30, 1)		## Signature
+                self.oled.text("Power Bank", 20, 40, 1)
+                
+                self.DrawBatteryPercentage(battery_voltage, percentSymbol, battery_percent_str)
+                
+                self.DrawChargingSymbol(previous_battery_voltage, battery_voltage)
+                    
+                # Create Battery Symbol
+                self.oled.rect(0, 0, 41, 10, 1)
+                self.oled.vline(10, 0, 10, 1)
+                self.oled.vline(20, 0, 10, 1)
+                self.oled.vline(30, 0, 10, 1)
+                self.oled.rect(41, 3, 3, 5, 1)	## Battery Terminal Symbol
+            
+                self.FillBatteryQuadrants(battery_voltage)
+                
+                self.oled.show()
+            ## ADD LOGIC THAT CLEARS DISPLAY ONCE BATTERY PERCENTAGE IS THE SAME FOR 6 SECONDS (IDLE POWER BANK LOGIC)
+            #elif (battery_percent_str == battery_percent_str):		## If the power bank is idle then power off the oled
+            else:
+                print("Power Stagnation Triggered! Clearing Display!")
+                #self.oled.poweroff()
+                self.oled.fill(0)
+                self.oled.show()
