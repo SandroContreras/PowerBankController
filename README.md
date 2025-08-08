@@ -20,7 +20,10 @@ This was my first time soldering. I quickly learned the soldering process throug
 
 ## Data Flow
 A diagram showing how the Pico processes battery voltage and displays SoC info on the OLED screen.
-![Data Flowchart](images/pico_battery_data_flow.svg)
+
+<p align="center">
+    <img width="33%" src="images/pico_battery_data_flow.svg" alt = "Data Flowchart">
+</p>
 
 ## Circuit Diagram
 A full schematic will be added soon.
