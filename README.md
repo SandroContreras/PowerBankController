@@ -19,7 +19,8 @@ Will cover:
 This was my first time soldering. I quickly learned the soldering process through soldering the Battery Case Holders to the Charging Module. This project also taught me the importance of solder flux, both for creating clean joints and for desoldering.
 
 ## Data Flow
-A diagram showing how the Pico and OLED handle battery health via ADC (Pin 26) is planned.
+A diagram showing how the Pico processes battery voltage and displays SoC info on the OLED screen.
+![Data Flowchart](images/pico_battery_data_flow.svg)
 
 ## Circuit Diagram
 A full schematic will be added soon.
