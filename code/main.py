@@ -36,9 +36,10 @@ window_average = 0
 previous_battery_voltage = 0
 battery_voltage = 0
 time_update = 0
+BatteryVoltageArr = []
         
-BatteryMethods = BatteryManager(raw, adc_voltage, i, SMA, window_average, battery_voltage, battery_percentage)
-OledMethods = OledUI(previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update)
+BatteryMethods = BatteryManager(raw, adc_voltage, i, SMA, window_average, battery_voltage, battery_percentage, BatteryVoltageArr)
+OledMethods = OledUI(previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update, BatteryVoltageArr)
 while True:
     
     previous_battery_voltage = BatteryMethods.PowerCalculator()
@@ -56,5 +57,4 @@ while True:
     
     OledMethods.OledSignal(previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str)
     
-
     OledMethods.variableUpdater(previous_battery_voltage, battery_voltage)	# Update the lower bounds to avoid an always on state
