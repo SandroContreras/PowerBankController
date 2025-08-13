@@ -26,7 +26,7 @@ This was my first time soldering. I quickly learned the soldering process throug
 <p align="center"><em>Data flow from ADC voltage reading to OLED UI output.</em></p>
 
 ## Circuit Diagram
-A full schematic will be added soon.
+A diagram will be added soon.
 
 ## Included Modules
 - 'bisect.py' - From the Python Standard Library (CPython 3.13)
