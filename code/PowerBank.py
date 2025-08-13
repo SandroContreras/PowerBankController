@@ -16,20 +16,22 @@ from machine import ADC
 ## Create ADC object on an ADC pin
 adc = ADC(Pin(26))	## GPIO 26 on Pico is an ADC0 Pin
 class BatteryManager:
-    def __init__(self, raw, adc_voltage, i, SMA, window_average, battery_voltage, battery_percentage):
+    def __init__(self, raw, adc_voltage, SMA_battery_voltage, window_average, battery_voltage, battery_percentage, BatteryVoltageArr):
         self.raw = raw
         self.adc_voltage = adc_voltage
         self.movingAvg = []
         self.windowSize = 60
-        self.i = i
-        self.SMA = SMA
+        self.SMA_battery_voltage = SMA_battery_voltage
         self.window_average = window_average
-        self.BatteryVoltageArr = []
+        self.BatteryVoltageArr = BatteryVoltageArr
         self.battery_voltage = battery_voltage
         self.battery_percentage = battery_percentage
         
     def AppendArray(self, element):
-        self.BatteryVoltageArr.append(element)
+        print("Using Append Array")
+        print("window Size in Append Array: ", self.windowSize)
+        if len(self.BatteryVoltageArr) <= self.windowSize:
+            self.BatteryVoltageArr.append(element)
     
     def PowerCalculator(self):						## Values 0 - 65535 represents voltages between 0V - 3.3V
         self.raw = adc.read_u16()					## Read a Raw analog value in the range 0 - 65535
@@ -39,35 +41,32 @@ class BatteryManager:
         return self.battery_voltage					## R1 = 47k ohm, R2 = 100k ohm
     
     def SetWindowSize(self, battery_voltage):		## Lithium batteries don't charge linearly
-        if self.battery_voltage < 3.9:				## Reduce greater noise before 3.9 V with large SMA window
-            self.windowSize = 60
-            
-        else:										## Less Noise beyond 3.9V so reduce SMA window
+        if self.battery_voltage >= 3.92:				## Reduce greater noise before 3.9 V with large SMA window
             self.windowSize = 12
+        else:										## Less Noise beyond 3.9V so reduce SMA window
+            self.windowSize = 60
             
         return self.windowSize
     
     def BatteryVoltage_SMA(self, battery_voltage):
-        self.SetWindowSize(self.battery_voltage)
+        self.WindowSize = self.SetWindowSize(self.battery_voltage)
         print("Window Size: ", self.windowSize)
-        for item in self.BatteryVoltageArr:
-            print("Voltages in Battery Voltage Array: ", item)
-        while self.i < len(self.BatteryVoltageArr) - self.windowSize + 1:	## Append to Array until window size is met
-            
-            self.window_average = round(sum(self.BatteryVoltageArr) / self.windowSize, 2)
-            self.battery_voltage = self.window_average	## battery_voltage = SMA of Battery Voltages
-            
-            self.movingAvg.append(self.battery_voltage)	## Store SMA in SMA array
-            print("SMA Battery Voltage:", self.battery_voltage)
-            self.BatteryVoltageArr.pop(0)
+        print("Length of Battery Voltage Arr in SMA: ", len(self.BatteryVoltageArr))
+        
+        if len(self.BatteryVoltageArr) < self.WindowSize:
+            self.BatteryVoltageArr.append(self.battery_voltage)
+        elif len(self.BatteryVoltageArr) == self.WindowSize:		## If length of moving data meets the Window Size, then perform SMA
+            self.SMA_battery_voltage = (sum(self.BatteryVoltageArr) / len(self.BatteryVoltageArr))
+            self.movingAvg.append(self.SMA_battery_voltage)
+        self.BatteryVoltageArr.pop(0)								
+        return self.SMA_battery_voltage
 
-        return self.battery_voltage
     
-    def SOCtable(self, battery_voltage):
-
+    def SOCtable(self, SMA_battery_voltage):
+        print("SMA Battery Voltage in SOC: ", self.SMA_battery_voltage)
         VoltageRange = [3.0, 3.1, 3.2, 3.3, 3.35, 3.4, 3.55, 3.6, 3.7, 3.8, 3.9, 4.0, 4.1, 4.2]
         Percentage = [5, 7, 10, 13, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-        Index =  bisect.bisect_left(VoltageRange, battery_voltage)
+        Index =  bisect.bisect_left(VoltageRange, self.SMA_battery_voltage)
         return Percentage[Index]
 
     def GetPowerDifference(self, previous_battery_voltage, battery_voltage):
@@ -82,18 +81,18 @@ class BatteryManager:
             return False					## If Power Difference < 0.01 V, then it's just power flickering
 
 class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Class
-    def __init__(self, previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update):
+    def __init__(self, previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update, BatteryVoltageArr):
         dummy_raw = 0
-        dummy_i = 0
         dummy_SMA = 0
         dummy_window_average = 0
         dummy_adc_voltage = 0
-        
-        super().__init__(dummy_raw, dummy_adc_voltage, dummy_i, dummy_SMA, dummy_window_average, battery_voltage, battery_percentage)		## I only need variables: battery_voltage, battery_percentage from parent class
+         
+        super().__init__(dummy_raw, dummy_adc_voltage, dummy_SMA, dummy_window_average, battery_voltage, battery_percentage, BatteryVoltageArr)		## I only need variables: battery_voltage, battery_percentage from parent class
         self.oled = oled
         self.percentSymbol = "%"
         self.time = 500
         self.time_update = 0
+#         self.BatteryVoltageArr = BatteryVoltageArr
         
     def variableUpdater(self, previous_battery_voltage, battery_voltage):
         self.previous_battery_voltage = self.battery_voltage
@@ -127,18 +126,18 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
             self.oled.fill_rect(86, 12, 1, 3, 1)
             self.oled.fill_rect(81, 4, 3, 3, 1)
     
-    def FillBatteryQuadrants(self, battery_voltage):
+    def FillBatteryQuadrants(self, SMA_battery_voltage):
         ## Create if statements to dicate which inner battery quadrants to fill in depending on battery health levels
-        if (3.0 <= battery_voltage <= 3.55):
+        if (3.0 <= self.SMA_battery_voltage <= 3.55):
             self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
-        elif (3.55 <= battery_voltage <= 3.70):
+        elif (3.55 <= self.SMA_battery_voltage <= 3.70):
             self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
             self.oled.fill_rect(12, 1, 8, 8, 1)		## Fill the 2nd quadrant
-        elif (3.70 <= battery_voltage <= 4.0):
+        elif (3.70 <= self.SMA_battery_voltage <= 4.0):
             self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
             self.oled.fill_rect(12, 1, 8, 8, 1)		## Fill the 2nd quadrant
             self.oled.fill_rect(22, 1, 8, 8, 1)		## Fill the 3rd quadrant
-        elif (4.0 <= battery_voltage <= 4.2):
+        elif (4.0 <= self.SMA_battery_voltage <= 4.2):
             self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
             self.oled.fill_rect(12, 1, 8, 8, 1)		## Fill the 2nd quadrant
             self.oled.fill_rect(22, 1, 8, 8, 1)		## Fill the 3rd quadrant
@@ -146,25 +145,27 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
     
     def BootMSG(self):
         self.oled.fill(0)
-        self.oled.text("Booting", 34, 30, 1)		## Boot MSG
-        self.oled.text("PowerCell...", 25, 40, 1)
+        self.oled.text("BatteryArr: " + (str(len(self.BatteryVoltageArr))), 0, 30, 1)			## Debugging Purposes
+        self.oled.text("WindowSize: " + (str(self.SetWindowSize(self.battery_voltage))), 0, 40, 1)
+        #self.oled.text((str(self.SetWindowSize)), 0, 40, 1)
+#         self.oled.text("Booting", 34, 30, 1)		## Boot MSG
+#         self.oled.text("PowerCell...", 25, 40, 1)
         self.oled.show()
     
     ## ADD LOGIC THAT ONLY ALLOWS SCREEN UPDATES ONCE WINDOW SIZE EQUALS 60 OR 12
-    def OledSignal(self, previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str):
-        #self.GetPowerDifference()
+    def OledSignal(self, previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str, BatteryVoltageArr):
         self.GetPowerDifference(previous_battery_voltage, battery_voltage)
         DifferenceBool = self.CheckPowerThreshold(previous_battery_voltage, battery_voltage)
-        print("Difference Bool State: ", DifferenceBool)
         
-        if len(self.BatteryVoltageArr) != self.SetWindowSize(self.battery_voltage):
-            print("Entering Boot MSG")
+        if len(self.BatteryVoltageArr) < ((self.SetWindowSize(self.battery_voltage)) - 1):		## We subtract the length of SetWindowSize() by one to compensate for the array.pop() that occurs in 
+            #print(self.SetWindowSize(self.battery_voltage))									## the BatteryVoltageSMA()
             self.BootMSG()
             print("Length of Battery Voltage Array: ", len(self.BatteryVoltageArr))
-        else:
-        ## if battery_voltage arr == 60 or 12
+        else:	## if battery_voltage arr == 60 or 12
+            print("Exiting Boot Message")
             ## Create Power Bank Interaction Signal
             ## The Oled will only display when the charging bank is Charging or Providing Charge
+            #if ((previous_battery_voltage < battery_voltage or previous_battery_voltage > battery_voltage)):
             if ((previous_battery_voltage < battery_voltage or previous_battery_voltage > battery_voltage) and DifferenceBool):
             
                 self.oled.fill(0)
@@ -172,7 +173,6 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
                 self.oled.text("Power Bank", 20, 40, 1)
                 
                 self.DrawBatteryPercentage(battery_voltage, percentSymbol, battery_percent_str)
-                
                 self.DrawChargingSymbol(previous_battery_voltage, battery_voltage)
                     
                 # Create Battery Symbol
