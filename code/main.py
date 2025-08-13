@@ -14,6 +14,7 @@ from PowerBank import BatteryManager, OledUI
 ## - This library (ssd1306.py) was manually downloaded from:
 ##   https://gist.github.com/cwyark/d7f2becd84b0b69b05a83315bf84c467
 ##   Not included in repo due to license uncertainty.
+time.sleep(0.3)		## Allow for Boot time
 
 # Initialize I2C
 i2c = I2C(0, scl=Pin(5), sda=Pin(4))
@@ -27,8 +28,7 @@ adc = ADC(Pin(26))	## GPIO 26 on Pico is an ADC0 Pin
 percentSymbol = "%"
 battery_percent_str = ""
 
-i = 0
-SMA = 0
+SMA_battery_voltage = 0
 battery_percentage = 0
 raw = 0
 adc_voltage = 0
@@ -36,9 +36,8 @@ window_average = 0
 previous_battery_voltage = 0
 battery_voltage = 0
 time_update = 0
-BatteryVoltageArr = []
-        
-BatteryMethods = BatteryManager(raw, adc_voltage, i, SMA, window_average, battery_voltage, battery_percentage, BatteryVoltageArr)
+BatteryVoltageArr = []        
+BatteryMethods = BatteryManager(raw, adc_voltage, SMA_battery_voltage, window_average, battery_voltage, battery_percentage, BatteryVoltageArr)
 OledMethods = OledUI(previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update, BatteryVoltageArr)
 while True:
     
@@ -49,12 +48,12 @@ while True:
     ## Use SMA to smoothen out the battery percentage
     BatteryMethods.AppendArray(battery_voltage)
 
-    battery_voltage = BatteryMethods.BatteryVoltage_SMA(battery_voltage)
+    SMA_battery_voltage = BatteryMethods.BatteryVoltage_SMA(battery_voltage)
     
-    battery_percentage = BatteryMethods.SOCtable(battery_voltage)
+    battery_percentage = BatteryMethods.SOCtable(SMA_battery_voltage)
      
     battery_percent_str = str(battery_percentage)
     
-    OledMethods.OledSignal(previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str)
+    OledMethods.OledSignal(previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str, BatteryVoltageArr)
     
-    OledMethods.variableUpdater(previous_battery_voltage, battery_voltage)	# Update the lower bounds to avoid an always on state
+    OledMethods.variableUpdater(previous_battery_voltage, battery_voltage)	# Update the lower bounds to avoid an always on state                                                      
