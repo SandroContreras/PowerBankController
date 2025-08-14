@@ -26,7 +26,11 @@ This was my first time soldering. I quickly learned the soldering process throug
 <p align="center"><em>Data flow from ADC voltage reading to OLED UI output.</em></p>
 
 ## Circuit Diagram
-A diagram will be added soon.
+
+<p align = "center">
+    <img width = "33%" src = "images/PortablePowerBank.svg" alt = Portable Powerbank Circuit Diagram">
+</p>
+<p align = "center"><em><This is the functioning circuit diagram for the Portable Power Bank.</em></This>p>
 
 ## Included Modules
 - 'bisect.py' - From the Python Standard Library (CPython 3.13)
