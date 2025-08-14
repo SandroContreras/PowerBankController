@@ -28,7 +28,7 @@ This was my first time soldering. I quickly learned the soldering process throug
 ## Circuit Diagram
 
 <p align = "center">
-    <img src = "images/PortablePowerBank.svg" width = "1000" alt = Portable Powerbank Circuit Diagram">
+    <img src = "images/PortablePowerBank.svg" width = "1500" alt = Portable Powerbank Circuit Diagram">
 </p>
 <p align = "center"><em><This is the functioning circuit diagram for the Portable Power Bank.</em></This>p>
 
