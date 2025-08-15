@@ -32,28 +32,31 @@ SMA_battery_voltage = 0
 battery_percentage = 0
 raw = 0
 adc_voltage = 0
+windowSize = 0
 window_average = 0
 previous_battery_voltage = 0
 battery_voltage = 0
 time_update = 0
 BatteryVoltageArr = []        
-BatteryMethods = BatteryManager(raw, adc_voltage, SMA_battery_voltage, window_average, battery_voltage, battery_percentage, BatteryVoltageArr)
-OledMethods = OledUI(previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update, BatteryVoltageArr)
+BatteryMethods = BatteryManager(raw, adc_voltage, SMA_battery_voltage, window_average, battery_voltage, battery_percentage, BatteryVoltageArr, windowSize)
+OledMethods = OledUI(previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update, BatteryVoltageArr, windowSize, SMA_battery_voltage)
 while True:
     
     previous_battery_voltage = BatteryMethods.PowerCalculator()
     time.sleep(0.5)							# Add a delay between readings for comparison
     battery_voltage = BatteryMethods.PowerCalculator()
 
-    ## Use SMA to smoothen out the battery percentage
-    BatteryMethods.AppendArray(battery_voltage)
+    windowSize = BatteryMethods.SetWindowSize(battery_voltage)
 
-    SMA_battery_voltage = BatteryMethods.BatteryVoltage_SMA(battery_voltage)
+    ## Use SMA to smoothen out the battery percentage
+    BatteryMethods.AppendArray(battery_voltage, windowSize)
+
+    SMA_battery_voltage = BatteryMethods.BatteryVoltage_SMA(battery_voltage, windowSize)
     
     battery_percentage = BatteryMethods.SOCtable(SMA_battery_voltage)
      
     battery_percent_str = str(battery_percentage)
     
-    OledMethods.OledSignal(previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str, BatteryVoltageArr)
+    OledMethods.OledSignal(previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str, BatteryVoltageArr, windowSize, SMA_battery_voltage)
     
     OledMethods.variableUpdater(previous_battery_voltage, battery_voltage)	# Update the lower bounds to avoid an always on state                                                      
