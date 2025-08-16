@@ -22,7 +22,6 @@ class BatteryManager:
         self.movingAvg = []
         self.windowSize = windowSize
         self.SMA_battery_voltage = SMA_battery_voltage
-#         self.window_average = window_average
         self.BatteryVoltageArr = BatteryVoltageArr
         self.battery_voltage = battery_voltage
         self.battery_percentage = battery_percentage
