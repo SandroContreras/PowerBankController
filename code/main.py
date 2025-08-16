@@ -32,13 +32,16 @@ SMA_battery_voltage = 0
 battery_percentage = 0
 raw = 0
 adc_voltage = 0
-window_average = 0
+windowSize = 0
+movingAvg = []
+>>>>>>> Stashed changes
 previous_battery_voltage = 0
 battery_voltage = 0
 time_update = 0
 BatteryVoltageArr = []        
-BatteryMethods = BatteryManager(raw, adc_voltage, SMA_battery_voltage, window_average, battery_voltage, battery_percentage, BatteryVoltageArr)
-OledMethods = OledUI(previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update, BatteryVoltageArr)
+<<<<<<< Updated upstream
+BatteryMethods = BatteryManager(raw, adc_voltage, SMA_battery_voltage, movingAvg, battery_voltage, battery_percentage, BatteryVoltageArr, windowSize)
+OledMethods = OledUI(previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update, BatteryVoltageArr, windowSize, SMA_battery_voltage)
 while True:
     
     previous_battery_voltage = BatteryMethods.PowerCalculator()
@@ -54,6 +57,8 @@ while True:
      
     battery_percent_str = str(battery_percentage)
     
-    OledMethods.OledSignal(previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str, BatteryVoltageArr)
+    movingAvgArrBool = BatteryMethods.Check_movingAvgArr(movingAvg)
     
-    OledMethods.variableUpdater(previous_battery_voltage, battery_voltage)	# Update the lower bounds to avoid an always on state                                                      
+    OledMethods.OledSignal(previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str, BatteryVoltageArr, windowSize, SMA_battery_voltage, movingAvgArrBool)
+    
+    OledMethods.BatteryVoltageUpdater(previous_battery_voltage, battery_voltage)	# Update the lower bounds to avoid an always on state                                                      
