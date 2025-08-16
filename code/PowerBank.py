@@ -48,7 +48,6 @@ class BatteryManager:
         return self.windowSize
     
     def BatteryVoltage_SMA(self, battery_voltage, windowSize):
-        #self.WindowSize = self.SetWindowSize(self.battery_voltage)
         print("Window Size in SMA: ", self.windowSize)
         print("Length of Battery Voltage Arr in SMA: ", len(self.BatteryVoltageArr))
         print("Length of Moving Average Arr in SMA: ", len(self.movingAvg))
@@ -62,7 +61,6 @@ class BatteryManager:
 
     
     def SOCtable(self, SMA_battery_voltage):
-#         print("self.SMA Battery Voltage id in SOC: ", (id(self.SMA_battery_voltage)))
         print("self.SMA Battery Voltage in SOC: ", self.SMA_battery_voltage)
         VoltageRange = [3.0, 3.1, 3.2, 3.3, 3.35, 3.4, 3.55, 3.6, 3.7, 3.8, 3.9, 4.0, 4.1, 4.2]
         Percentage = [5, 7, 10, 13, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100]
@@ -132,7 +130,6 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
             self.oled.fill_rect(81, 4, 3, 3, 1)
     
     def FillBatteryQuadrants(self, SMA_battery_voltage):
-#         print("self.SMA Battery Voltage id in Battery Quads: ", (id(self.SMA_battery_voltage)))
         print("self.SMA Battery Voltage in Battery Quads: ", SMA_battery_voltage)
         ## Create if statements to dicate which inner battery quadrants to fill in depending on battery health levels
         if (3.0 <= SMA_battery_voltage <= 3.55):
@@ -196,6 +193,5 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
                 #elif (battery_percent_str == battery_percent_str):		## If the power bank is idle then power off the oled
                 else:
                     print("Power Stagnation Triggered! Clearing Display!")
-                    #self.oled.poweroff()
                     self.oled.fill(0)
                     self.oled.show()
