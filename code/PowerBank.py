@@ -48,15 +48,17 @@ class BatteryManager:
         return self.windowSize
     
     def BatteryVoltage_SMA(self, battery_voltage, windowSize):
-        print("Window Size in SMA: ", self.windowSize)
-        print("Length of Battery Voltage Arr in SMA: ", len(self.BatteryVoltageArr))
-        print("Length of Moving Average Arr in SMA: ", len(self.movingAvg))
+#         print("Window Size in SMA: ", self.windowSize)
+#         print("Length of Battery Voltage Arr in SMA: ", len(self.BatteryVoltageArr))
+#         print("Length of Moving Average Arr in SMA: ", len(self.movingAvg))
         if len(self.BatteryVoltageArr) < self.windowSize:
             self.BatteryVoltageArr.append(self.battery_voltage)
         elif len(self.BatteryVoltageArr) == self.windowSize:		## If length of moving data meets the Window Size, then perform SMA
+            self.BatteryVoltageArr.pop(0)
+            self.BatteryVoltageArr.append(self.battery_voltage)
             self.SMA_battery_voltage = (sum(self.BatteryVoltageArr) / len(self.BatteryVoltageArr))
             self.movingAvg.append(self.SMA_battery_voltage)
-        self.BatteryVoltageArr.pop(0)								
+            self.BatteryVoltageArr.pop(0)								
         return self.SMA_battery_voltage
 
     
@@ -149,11 +151,10 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
     
     def BootMSG(self, BatteryVoltageArr):
         self.oled.fill(0)
-#         self.oled.text("BatteryArr: " + (str(len(BatteryVoltageArr))), 0, 30, 1)			## Debugging Purposes
-#         self.oled.text("WindowSize: " + (str(self.SetWindowSize(self.battery_voltage))), 0, 40, 1)
-#         self.oled.text((str(self.SetWindowSize)), 0, 40, 1)
-        self.oled.text("Booting", 34, 30, 1)		## Boot MSG
-        self.oled.text("PowerCell...", 25, 40, 1)
+        self.oled.text("BatteryArr: " + (str(len(BatteryVoltageArr))), 0, 30, 1)			## Debugging Purposes
+        self.oled.text("WindowSize: " + (str(self.SetWindowSize(self.battery_voltage))), 0, 40, 1)
+#         self.oled.text("Booting", 34, 30, 1)		## Boot MSG
+#         self.oled.text("PowerCell...", 25, 40, 1)
         self.oled.show()
     
     ## ADD LOGIC THAT ONLY ALLOWS SCREEN UPDATES ONCE WINDOW SIZE EQUALS 60 OR 12
@@ -170,7 +171,7 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
             ## Create Power Bank Interaction Signal
             ## The Oled will only display when the charging bank is Charging or Providing Charge
             if movingAvgArrBool:		## If SMA occured at least once, then proceed
-                if ((previous_battery_voltage < battery_voltage or previous_battery_voltage > battery_voltage) and DifferenceBool):
+                if ((previous_battery_voltage != battery_voltage) and DifferenceBool):
                 
                     self.oled.fill(0)
                     self.oled.text("Sandro's", 30, 30, 1)		## Signature

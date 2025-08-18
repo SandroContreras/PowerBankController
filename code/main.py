@@ -1,6 +1,7 @@
 from machine import Pin, I2C
 import ssd1306
 import time
+import utime
 import bisect
 from machine import ADC
 from PowerBank import BatteryManager, OledUI
@@ -34,24 +35,33 @@ raw = 0
 adc_voltage = 0
 windowSize = 0
 movingAvg = []
->>>>>>> Stashed changes
 previous_battery_voltage = 0
 battery_voltage = 0
 time_update = 0
 BatteryVoltageArr = []        
-<<<<<<< Updated upstream
 BatteryMethods = BatteryManager(raw, adc_voltage, SMA_battery_voltage, movingAvg, battery_voltage, battery_percentage, BatteryVoltageArr, windowSize)
 OledMethods = OledUI(previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update, BatteryVoltageArr, windowSize, SMA_battery_voltage)
+
+delayMS = 500
+timeStart = utime.ticks_ms()
 while True:
     
     previous_battery_voltage = BatteryMethods.PowerCalculator()
-    time.sleep(0.5)							# Add a delay between readings for comparison
+    
+#     if (utime.ticks_diff(utime.ticks_ms(), timeStart) >= delayMS):
+#         print("Non-Blocking timer works")
+#         battery_voltage = BatteryMethods.PowerCalculator()
+#         timeStart = utime.ticks_ms()
+    time.sleep_ms(4)
+#     time.sleep(0.3)							# Add a delay between readings for comparison
     battery_voltage = BatteryMethods.PowerCalculator()
 
-    ## Use SMA to smoothen out the battery percentage
-    BatteryMethods.AppendArray(battery_voltage)
+    windowSize = BatteryMethods.SetWindowSize(battery_voltage)
 
-    SMA_battery_voltage = BatteryMethods.BatteryVoltage_SMA(battery_voltage)
+    ## Use SMA to smoothen out the battery percentage
+    BatteryMethods.AppendArray(battery_voltage, windowSize)
+
+    SMA_battery_voltage = BatteryMethods.BatteryVoltage_SMA(battery_voltage, windowSize)
     
     battery_percentage = BatteryMethods.SOCtable(SMA_battery_voltage)
      
