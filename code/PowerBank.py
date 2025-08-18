@@ -57,8 +57,7 @@ class BatteryManager:
             self.BatteryVoltageArr.pop(0)
             self.BatteryVoltageArr.append(self.battery_voltage)
             self.SMA_battery_voltage = (sum(self.BatteryVoltageArr) / len(self.BatteryVoltageArr))
-            self.movingAvg.append(self.SMA_battery_voltage)
-            self.BatteryVoltageArr.pop(0)								
+            self.movingAvg.append(self.SMA_battery_voltage)								
         return self.SMA_battery_voltage
 
     
