@@ -10,6 +10,7 @@
 from machine import Pin, I2C
 import ssd1306
 import time
+import utime
 import bisect
 from machine import ADC
 
@@ -25,12 +26,6 @@ class BatteryManager:
         self.BatteryVoltageArr = BatteryVoltageArr
         self.battery_voltage = battery_voltage
         self.battery_percentage = battery_percentage
-        
-    def AppendArray(self, element, windowSize):
-        print("Using Append Array")
-        print("window Size in Append Array: ", self.windowSize)
-        if len(self.BatteryVoltageArr) < self.windowSize:
-            self.BatteryVoltageArr.append(element)
     
     def PowerCalculator(self):						## Values 0 - 65535 represents voltages between 0V - 3.3V
         self.raw = adc.read_u16()					## Read a Raw analog value in the range 0 - 65535
@@ -58,7 +53,6 @@ class BatteryManager:
             self.BatteryVoltageArr.append(self.battery_voltage)
             self.SMA_battery_voltage = (sum(self.BatteryVoltageArr) / len(self.BatteryVoltageArr))
             self.movingAvg.append(self.SMA_battery_voltage)
-            self.BatteryVoltageArr.pop(0)								
         return self.SMA_battery_voltage
 
     
@@ -88,7 +82,7 @@ class BatteryManager:
 
 
 class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Class
-    def __init__(self, previous_battery_voltage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update, BatteryVoltageArr, windowSize, SMA_battery_voltage):
+    def __init__(self, previous_battery_voltage, previous_battery_percent_str, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update, BatteryVoltageArr, windowSize, SMA_battery_voltage, delayMS):
         dummy_raw = 0
         dummy_window_average = 0
         dummy_adc_voltage = 0
@@ -96,8 +90,9 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
         super().__init__(dummy_raw, dummy_adc_voltage, dummy_window_average, battery_voltage, battery_percentage, BatteryVoltageArr, windowSize, SMA_battery_voltage)		## I only need variables: battery_voltage, battery_percentage from parent class
         self.oled = oled
         self.percentSymbol = "%"
-        self.time = 500
+        self.timeStart = utime.ticks_ms()
         self.time_update = 0
+        self.delayMS = 6000
         
     def BatteryVoltageUpdater(self, previous_battery_voltage, battery_voltage):
         self.previous_battery_voltage = self.battery_voltage
@@ -150,15 +145,16 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
             self.oled.fill_rect(32, 1, 8, 8, 1)		## Fill the last quadrant
     
     def BootMSG(self, BatteryVoltageArr):
+        print("Inside Boot Message")
         self.oled.fill(0)
         self.oled.text("BatteryArr: " + (str(len(BatteryVoltageArr))), 0, 30, 1)			## Debugging Purposes
-        self.oled.text("WindowSize: " + (str(self.SetWindowSize(self.battery_voltage))), 0, 40, 1)
+#         self.oled.text("WindowSize: " + (str(self.SetWindowSize(self.battery_voltage))), 0, 40, 1)
 #         self.oled.text("Booting", 34, 30, 1)		## Boot MSG
 #         self.oled.text("PowerCell...", 25, 40, 1)
         self.oled.show()
     
     ## ADD LOGIC THAT ONLY ALLOWS SCREEN UPDATES ONCE WINDOW SIZE EQUALS 60 OR 12
-    def OledSignal(self, previous_battery_voltage, percentSymbol, battery_voltage, battery_percent_str, BatteryVoltageArr, windowSize, SMA_battery_voltage, movingAvgArrBool):
+    def OledSignal(self, previous_battery_voltage, percentSymbol, battery_voltage, previous_battery_percent_str, battery_percent_str, BatteryVoltageArr, windowSize, SMA_battery_voltage, movingAvgArrBool, delayMS, timeStart):
         self.GetPowerDifference(previous_battery_voltage, battery_voltage)
         DifferenceBool = self.CheckPowerThreshold(previous_battery_voltage, battery_voltage)
         
@@ -170,8 +166,12 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
             print("Exiting Boot Message")
             ## Create Power Bank Interaction Signal
             ## The Oled will only display when the charging bank is Charging or Providing Charge
+            
+            print("movingAvgArrBool = ", movingAvgArrBool)
+            print("DifferenceBool = ", DifferenceBool)
             if movingAvgArrBool:		## If SMA occured at least once, then proceed
-                if ((previous_battery_voltage != battery_voltage) and DifferenceBool):
+#                 if ((previous_battery_voltage != battery_voltage) and DifferenceBool):
+                if ((previous_battery_percent_str != battery_percent_str) and DifferenceBool):
                 
                     self.oled.fill(0)
                     self.oled.text("Sandro's", 30, 30, 1)		## Signature
@@ -193,6 +193,12 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
                 ## ADD LOGIC THAT CLEARS DISPLAY ONCE BATTERY PERCENTAGE IS THE SAME FOR 6 SECONDS (IDLE POWER BANK LOGIC)
                 #elif (battery_percent_str == battery_percent_str):		## If the power bank is idle then power off the oled
                 else:
-                    print("Power Stagnation Triggered! Clearing Display!")
-                    self.oled.fill(0)
-                    self.oled.show()
+                    if (utime.ticks_diff(utime.ticks_ms(), timeStart) >= delayMS):
+                        print("Non-Blocking timer works!!!!!!!!")
+                        print("Power Stagnation Triggered! Clearing Display!")
+                        self.oled.fill(0)
+                        self.oled.show()
+                        timeStart = utime.ticks_ms()
+#                     print("Power Stagnation Triggered! Clearing Display!")
+#                     self.oled.fill(0)
+#                     self.oled.show()
