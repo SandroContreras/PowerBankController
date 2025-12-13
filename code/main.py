@@ -63,11 +63,6 @@ while True:
 
     SMA_battery_voltage = BatteryMethods.BatteryVoltage_SMA(battery_voltage, windowSize)		## Use SMA to smoothen out the battery percentage
     
-    previous_battery_percentage = BatteryMethods.SOCtable(SMA_battery_voltage)					## previous_battery_percentage is an integer
-    previous_battery_percent_str = str(previous_battery_percentage)
-    
-#     time.sleep_ms(1)
-    
     battery_percentage = BatteryMethods.SOCtable(SMA_battery_voltage)							## battery_percentage is an integer
     battery_percent_str = str(battery_percentage)
     
