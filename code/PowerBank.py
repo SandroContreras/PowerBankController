@@ -59,9 +59,9 @@ class BatteryManager:
         return self.SMA_battery_voltage
     
     def SOCtable(self, SMA_battery_voltage):
-        VoltageRange = [3.0, 3.1, 3.2, 3.3, 3.35, 3.4, 3.55, 3.6, 3.7, 3.8, 3.9, 4.0, 4.1, 4.2]
-        Percentage = [5, 7, 10, 13, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-        Index =  bisect.bisect_left(VoltageRange, self.SMA_battery_voltage)
+        VoltageRange = [3.0, 3.1, 3.2, 3.3, 3.35, 3.4, 3.55, 3.6, 3.7, 3.8, 3.9, 4.0, 4.1, 4.15, 4.2]
+        Percentage = [5, 7, 10, 13, 15, 20, 30, 40, 50, 60, 70, 80, 90, 95, 100]
+        Index =  bisect.bisect_right(VoltageRange, self.SMA_battery_voltage) - 1
         return Percentage[Index]
 
     def GetPowerDifference(self, previous_battery_voltage, battery_voltage):
@@ -82,7 +82,7 @@ class BatteryManager:
 
 
 class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Class
-    def __init__(self, previous_battery_voltage, previous_battery_percent_str, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update, BatteryVoltageArr, windowSize, SMA_battery_voltage, delayMS):
+    def __init__(self, previous_battery_voltage, previous_battery_percent_str, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, BatteryVoltageArr, windowSize, SMA_battery_voltage):
         dummy_raw = 0
         dummy_window_average = 0
         dummy_adc_voltage = 0
@@ -97,16 +97,19 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
     def BatteryVoltageUpdater(self, previous_battery_voltage, battery_voltage):
         self.previous_battery_voltage = self.battery_voltage
         
-    def DrawBatteryPercentage(self, battery_voltage, percentSymbol, battery_percent_str):
-        if (battery_voltage >= 3.20):
+    def DrawBatteryPercentage(self, SMA_battery_voltage, percentSymbol, battery_percent_str):
         
-            ## Display Battery Percentage for Double Digit Value
-            self.oled.text(self.percentSymbol, 65, 0)
-            self.oled.text(battery_percent_str, 50, 0)
-        else:
+        if (SMA_battery_voltage < 3.2):
             ## Shift Percent Symbol inwards towards the Single Digit Value
             self.oled.text(self.percentSymbol, 121, 4)
             self.oled.text(battery_percent_str, 110, 4)
+        elif (SMA_battery_voltage < 4.1):
+            ## Display Battery Percentage for Double Digit Value
+            self.oled.text(self.percentSymbol, 65, 0)
+            self.oled.text(battery_percent_str, 50, 0)
+        elif (SMA_battery_voltage >= 4.17):	## Triple digit value display
+            self.oled.text(self.percentSymbol, 80, 0)
+            self.oled.text(battery_percent_str, 70, 0)
         
     def DrawChargingSymbol(self, previous_battery_voltage, battery_voltage):
         if (previous_battery_voltage < battery_voltage):		## The Charging symbol will only appear if the Bank is Charging
@@ -154,11 +157,10 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
         self.oled.show()
     
     ## ADD LOGIC THAT ONLY ALLOWS SCREEN UPDATES ONCE WINDOW SIZE EQUALS 60 OR 12
-    def OledSignal(self, previous_battery_voltage, percentSymbol, battery_voltage, previous_battery_percent_str, battery_percent_str, BatteryVoltageArr, windowSize, SMA_battery_voltage, movingAvgArrBool, delayMS, timeStart):
+    def OledSignal(self, previous_battery_voltage, percentSymbol, battery_voltage, previous_battery_percent_str, battery_percent_str, BatteryVoltageArr, windowSize, SMA_battery_voltage, movingAvgArrBool):
         self.GetPowerDifference(previous_battery_voltage, battery_voltage)
         DifferenceBool = self.CheckPowerThreshold(previous_battery_voltage, battery_voltage)
         
-#         print("windowSize = ", windowSize)
         print("Length of Battery Voltage Array: ", len(BatteryVoltageArr))
         if (len(BatteryVoltageArr)) < (windowSize - 1):			## We subtract the length of SetWindowSize() by one to compensate for the array.pop() that occurs in
             self.BootMSG(BatteryVoltageArr)						## the BatteryVoltageSMA()
@@ -170,7 +172,7 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
             ## The Oled will only display when the charging bank is Charging or Providing Charge
             
 
-            if movingAvgArrBool:		## If SMA occured at least once, then proceed
+            if movingAvgArrBool:		## If SMA occured at least once, and the battery difference is beyond flickers
                 if ((previous_battery_percent_str != battery_percent_str) and DifferenceBool):
                 
                     self.oled.fill(0)
@@ -190,15 +192,3 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
                     self.FillBatteryQuadrants(SMA_battery_voltage)
                     
                     self.oled.show()
-                ## ADD LOGIC THAT CLEARS DISPLAY ONCE BATTERY PERCENTAGE IS THE SAME FOR 6 SECONDS (IDLE POWER BANK LOGIC)
-                #elif (battery_percent_str == battery_percent_str):		## If the power bank is idle then power off the oled
-                else:
-                    if (utime.ticks_diff(utime.ticks_ms(), timeStart) >= delayMS):
-                        print("Non-Blocking timer works!!!!!!!!")
-                        print("Power Stagnation Triggered! Clearing Display!")
-                        self.oled.fill(0)
-                        self.oled.show()
-                        timeStart = utime.ticks_ms()
-#                     print("Power Stagnation Triggered! Clearing Display!")
-#                     self.oled.fill(0)
-#                     self.oled.show()
