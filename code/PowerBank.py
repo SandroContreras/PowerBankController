@@ -24,6 +24,12 @@ class BatteryManager:
         self.BatteryVoltageArr = BatteryVoltageArr
         self.battery_voltage = battery_voltage
         self.battery_percentage = battery_percentage
+        
+    def AppendArray(self, element, windowSize):
+        print("Using Append Array")
+        print("window Size in Append Array: ", self.windowSize)
+        if len(self.BatteryVoltageArr) < self.windowSize:
+            self.BatteryVoltageArr.append(element)
     
     def PowerCalculator(self):						## Values 0 - 65535 represents voltages between 0V - 3.3V
         self.raw = adc.read_u16()					## Read a Raw analog value in the range 0 - 65535
