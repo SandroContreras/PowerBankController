@@ -18,7 +18,8 @@ from PowerBank import BatteryManager, OledUI
 time.sleep(0.3)		## Allow for Boot time
 
 # Initialize I2C
-i2c = I2C(0, scl=Pin(5), sda=Pin(4))
+i2c = I2C(0, scl=Pin(1), sda=Pin(0))
+# print(i2c.scan())
 
 # Create display object (128x64 OLED at address 0x3C)
 oled = ssd1306.SSD1306_I2C(128, 64, i2c)
@@ -36,21 +37,13 @@ raw = 0
 adc_voltage = 0
 windowSize = 0
 movingAvg = []
-previous_battery_voltage = 0
+previous_SMA_battery_voltage = 0
 battery_voltage = 0
-time_update = 0
 BatteryVoltageArr = []
-delayMS = 0
+
 BatteryMethods = BatteryManager(raw, adc_voltage, SMA_battery_voltage, movingAvg, battery_voltage, battery_percentage, BatteryVoltageArr, windowSize)
-OledMethods = OledUI(previous_battery_voltage, previous_battery_percentage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, time, time_update, BatteryVoltageArr, windowSize, SMA_battery_voltage, delayMS)
+OledMethods = OledUI(previous_SMA_battery_voltage, previous_battery_percentage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, BatteryVoltageArr, windowSize, SMA_battery_voltage)
 
-#     if (utime.ticks_diff(utime.ticks_ms(), timeStart) >= delayMS):
-#         print("Non-Blocking timer works")
-#         battery_voltage = BatteryMethods.PowerCalculator()
-#         timeStart = utime.ticks_ms()
-
-delayMS = 6000
-timeStart = utime.ticks_ms()
 while True:
     
     previous_battery_voltage = BatteryMethods.PowerCalculator()
@@ -63,18 +56,13 @@ while True:
 
     SMA_battery_voltage = BatteryMethods.BatteryVoltage_SMA(battery_voltage, windowSize)		## Use SMA to smoothen out the battery percentage
     
-    previous_battery_percentage = BatteryMethods.SOCtable(SMA_battery_voltage)					## previous_battery_percentage is an integer
-    previous_battery_percent_str = str(previous_battery_percentage)
-    
-#     time.sleep_ms(1)
-    
     battery_percentage = BatteryMethods.SOCtable(SMA_battery_voltage)							## battery_percentage is an integer
     battery_percent_str = str(battery_percentage)
     
     movingAvgArrBool = BatteryMethods.Check_movingAvgArr(movingAvg)
     
-    OledMethods.OledSignal(previous_battery_voltage, percentSymbol, battery_voltage, previous_battery_percentage, battery_percent_str, BatteryVoltageArr, windowSize, SMA_battery_voltage, movingAvgArrBool, delayMS, timeStart)
+    OledMethods.OledSignal(previous_SMA_battery_voltage, percentSymbol, battery_voltage, previous_battery_percentage, battery_percent_str, BatteryVoltageArr, windowSize, SMA_battery_voltage, movingAvgArrBool)
     
-    OledMethods.BatteryVoltageUpdater(previous_battery_voltage, battery_voltage)	# Update the lower bounds to avoid an always on state
+    previous_SMA_battery_voltage = OledMethods.BatteryVoltageUpdater(previous_SMA_battery_voltage, SMA_battery_voltage)	# Update the lower bounds to avoid an always on state
     
     previous_battery_percentage = battery_percentage
