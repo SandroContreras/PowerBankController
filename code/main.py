@@ -1,7 +1,6 @@
 from machine import Pin, I2C
 import ssd1306
 import time
-import utime
 import bisect
 from machine import ADC
 from PowerBank import BatteryManager, OledUI

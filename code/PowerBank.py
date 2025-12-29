@@ -10,6 +10,7 @@
 from machine import Pin, I2C
 import ssd1306
 import bisect
+import time
 from machine import ADC
 
 ## Create ADC object on an ADC pin
@@ -57,9 +58,15 @@ class BatteryManager:
         return self.SMA_battery_voltage
     
     def SOCtable(self, SMA_battery_voltage):
-        VoltageRange = [3.0, 3.1, 3.2, 3.3, 3.35, 3.4, 3.55, 3.6, 3.7, 3.8, 3.9, 4.0, 4.1, 4.15, 4.2]
-        Percentage = [5, 7, 10, 13, 15, 20, 30, 40, 50, 60, 70, 80, 90, 95, 100]
-        Index =  bisect.bisect_right(VoltageRange, self.SMA_battery_voltage) - 1
+        VoltageRange = [2.8, 3.0, 3.1, 3.2, 3.3, 3.35, 3.4, 3.45, 3.50, 3.55, 3.6, 3.7, 3.75, 3.8, 3.9, 3.95, 4.0, 4.05, 4.1, 4.15, 4.2]
+        Percentage =   [  2,   5,   7,  10,  13,   15,  20,   25,   30,   35,  40,  50,   60,  65,  70,   75,  80,   85,  90,   95, 100]
+        if (SMA_battery_voltage < 2.8):
+            Index = 0
+        elif (SMA_battery_voltage > 4.2) :
+            Index = len(VoltageRange) - 1
+        else:
+            Index =  bisect.bisect_right(VoltageRange, self.SMA_battery_voltage) - 1
+            
         return Percentage[Index]
         
     def Check_movingAvgArr(self, movingAvg):
@@ -86,22 +93,19 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
         
         if (SMA_battery_voltage < 3.2):
             ## Shift Percent Symbol inwards towards the Single Digit Value
-            self.oled.text(self.percentSymbol, 65, 4)
-            self.oled.text(battery_percent_str, 35, 4)
+            self.oled.text(self.percentSymbol, 65, 2)
+            self.oled.text(battery_percent_str, 57, 2)
         elif (SMA_battery_voltage < 4.1):
             ## Display Battery Percentage for Double Digit Value
-            self.oled.text(self.percentSymbol, 65, 0)
-            self.oled.text(battery_percent_str, 50, 0)
+            self.oled.text(self.percentSymbol, 65, 2)
+            self.oled.text(battery_percent_str, 50, 2)
         elif (SMA_battery_voltage >= 4.17):	## Triple digit value display
-            self.oled.text(self.percentSymbol, 80, 0)
-            self.oled.text(battery_percent_str, 70, 0)
+            self.oled.text(self.percentSymbol, 80, 2)
+            self.oled.text(battery_percent_str, 70, 2)
         
     def DrawChargingSymbol(self, previous_SMA_battery_voltage, SMA_battery_voltage):
-        print("previous_SMA_battery_voltage = " + str(previous_SMA_battery_voltage))
-        print("SMA_battery_voltage = " + str(SMA_battery_voltage))
         
         VoltageChangeRate = SMA_battery_voltage - previous_SMA_battery_voltage
-        print("VoltageChangeRate = " + str(VoltageChangeRate))
         
         if (previous_SMA_battery_voltage != 0 and VoltageChangeRate > 0.0003):		## The Charging symbol will only appear if the Bank is Charging
             ## Create Charging Symbol
@@ -122,51 +126,85 @@ class OledUI(BatteryManager):		## Inherit the variables from BatteryManager Clas
             self.oled.fill_rect(81, 4, 3, 3, 1)
     
     def FillBatteryQuadrants(self, SMA_battery_voltage):
-        print("self.SMA Battery Voltage in Battery Quads: ", SMA_battery_voltage)
-        if (3.0 <= SMA_battery_voltage <= 3.55):
+        if (SMA_battery_voltage < 3.2):	## if less than 10%
+            self.oled.fill_rect(1, 1, 2, 8, 1)		## Fill the 1st quadrant
+        elif (3.2 <= SMA_battery_voltage <= 3.4):	## if inbetween 10% and 20%
+            self.oled.fill_rect(1, 1, 3, 8, 1)		## Fill the 1st quadrant
+        elif (3.4 <= SMA_battery_voltage <= 3.45):	## if inbetween 20% and 25%
             self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
-        elif (3.55 <= SMA_battery_voltage <= 3.70):
+        elif (3.45 <= SMA_battery_voltage <= 3.55):	## if inbetween 25% and 35%
+            self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
+            self.oled.fill_rect(12, 1, 2, 8, 1)		## Fill the 2nd quadrant
+        elif (3.55 <= SMA_battery_voltage <= 3.6):	## if inbetween 35% and 40%
+            self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
+            self.oled.fill_rect(12, 1, 6, 8, 1)		## Fill the 2nd quadrant
+        elif (3.6 <= SMA_battery_voltage <= 3.70):	## if inbetween 40% and 50%
             self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
             self.oled.fill_rect(12, 1, 8, 8, 1)		## Fill the 2nd quadrant
-        elif (3.70 <= SMA_battery_voltage <= 4.0):
+        elif (3.70 <= SMA_battery_voltage <= 3.75):	## if inbetween 50% and 55%
+            self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
+            self.oled.fill_rect(12, 1, 8, 8, 1)		## Fill the 2nd quadrant
+            self.oled.fill_rect(22, 1, 1, 8, 1)		## Fill the 3rd quadrant
+        elif (3.75 <= SMA_battery_voltage <= 3.8):	## if inbetween 60% and 65%
+            self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
+            self.oled.fill_rect(12, 1, 8, 8, 1)		## Fill the 2nd quadrant
+            self.oled.fill_rect(22, 1, 3, 8, 1)		## Fill the 3rd quadrant
+        elif (3.8 <= SMA_battery_voltage <= 3.9):	## if inbetween 65% and 70%
+            self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
+            self.oled.fill_rect(12, 1, 8, 8, 1)		## Fill the 2nd quadrant
+            self.oled.fill_rect(22, 1, 5, 8, 1)		## Fill the 2nd quadrant
+        elif (3.9 <= SMA_battery_voltage <= 3.95):	## if inbetween 70% and 75%
             self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
             self.oled.fill_rect(12, 1, 8, 8, 1)		## Fill the 2nd quadrant
             self.oled.fill_rect(22, 1, 8, 8, 1)		## Fill the 3rd quadrant
-        elif (4.0 <= SMA_battery_voltage <= 4.2):
+        elif (3.95 <= SMA_battery_voltage <= 4.0):	## if inbetween 75% and 80%
+            self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
+            self.oled.fill_rect(12, 1, 8, 8, 1)		## Fill the 2nd quadrant
+            self.oled.fill_rect(22, 1, 8, 8, 1)		## Fill the 3rd quadrant
+            self.oled.fill_rect(32, 1, 1, 8, 1)		## Fill the last quadrant
+        elif (4.0 <= SMA_battery_voltage <= 4.05):	## if inbetween 80% and 85%
+            self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
+            self.oled.fill_rect(12, 1, 8, 8, 1)		## Fill the 2nd quadrant
+            self.oled.fill_rect(22, 1, 8, 8, 1)		## Fill the 3rd quadrant
+            self.oled.fill_rect(32, 1, 3, 8, 1)		## Fill the last quadrant
+        elif (4.05 <= SMA_battery_voltage <= 4.1):	## if inbetween 85% and 90%
+            self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
+            self.oled.fill_rect(12, 1, 8, 8, 1)		## Fill the 2nd quadrant
+            self.oled.fill_rect(22, 1, 8, 8, 1)		## Fill the 3rd quadrant
+            self.oled.fill_rect(32, 1, 5, 8, 1)		## Fill the last quadrant
+        elif (4.1 <= SMA_battery_voltage <= 4.15):	## if inbetween 90% and 95%
+            self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
+            self.oled.fill_rect(12, 1, 8, 8, 1)		## Fill the 2nd quadrant
+            self.oled.fill_rect(22, 1, 8, 8, 1)		## Fill the 3rd quadrant
+            self.oled.fill_rect(32, 1, 6, 8, 1)		## Fill the last quadrant
+        elif (4.15 <= SMA_battery_voltage <= 4.2):	## if inbetween 95% and 100%
             self.oled.fill_rect(1, 1, 9, 8, 1)		## Fill the 1st quadrant
             self.oled.fill_rect(12, 1, 8, 8, 1)		## Fill the 2nd quadrant
             self.oled.fill_rect(22, 1, 8, 8, 1)		## Fill the 3rd quadrant
             self.oled.fill_rect(32, 1, 8, 8, 1)		## Fill the last quadrant
     
     def BootMSG(self, BatteryVoltageArr):
-        print("Inside Boot Message")
         self.oled.fill(0)
-        self.oled.text("BatteryArr: " + (str(len(BatteryVoltageArr))), 0, 30, 1)			## Debugging Purposes
-#         self.oled.text("WindowSize: " + (str(self.SetWindowSize(self.battery_voltage))), 0, 40, 1)
-#         self.oled.text("Booting", 34, 30, 1)		## Boot MSG
-#         self.oled.text("PowerCell...", 25, 40, 1)
+        self.oled.text("Booting...", 30, 18, 1)		## Boot MSG
+        self.oled.text("LiPack", 30, 34, 1)
+        self.oled.text("v1.0-PY", 30, 46, 1)
         self.oled.show()
     
     ## ADD LOGIC THAT ONLY ALLOWS SCREEN UPDATES ONCE WINDOW SIZE EQUALS 60 OR 12
     def OledSignal(self, previous_SMA_battery_voltage, percentSymbol, battery_voltage, previous_battery_percent_str, battery_percent_str, BatteryVoltageArr, windowSize, SMA_battery_voltage, movingAvgArrBool):
-        
-        print("Length of Battery Voltage Array: ", len(BatteryVoltageArr))
-        if (len(BatteryVoltageArr)) < (windowSize):
+
+        if (not movingAvgArrBool):	## If SMA never occured
             self.BootMSG(BatteryVoltageArr)
             
-        else:	## if battery_voltage arr == 59 or 11
-            print("Exiting Boot Message")
+        else:	## if SMA occured
             
             ## Create Power Bank Interaction Signal
             ## The Oled will only display when the charging bank is Charging or Providing Charge
-            print("moving Average Array Bool: " + str(movingAvgArrBool))
 
-            if movingAvgArrBool:		## If SMA occured at least once, and the battery difference is beyond flickers
-                if (previous_battery_percent_str != battery_percent_str):
+            if (previous_battery_percent_str != battery_percent_str):
                 
                     self.oled.fill(0)
-                    self.oled.text("Sandro's", 30, 30, 1)		## Signature
-                    self.oled.text("Power Bank", 20, 40, 1)
+                    self.oled.text("LiPack", 81, 57, 1)		## Signature
                     
                     self.DrawBatteryPercentage(SMA_battery_voltage, percentSymbol, battery_percent_str)
                     self.DrawChargingSymbol(previous_SMA_battery_voltage, SMA_battery_voltage)
