@@ -32,10 +32,21 @@ class BatteryManager:
         self.battery_voltage = self.adc_voltage * 1.47 	## Battery Voltage = Adc Voltage * ((R1+R2) / R2)
     
     def SetWindowSize(self):		## Lithium batteries don't charge linearly
-        if self.battery_voltage >= 3.92:				## Reduce greater noise before 3.9 V with large SMA window
-            self.windowSize = 12
-        else:										## Less Noise beyond 3.9V so reduce SMA window
-            self.windowSize = 60
+        if self.battery_voltage < 3.7:
+            self.windowSize = 30
+        elif self.battery_voltage < 3.9:
+            self.windowSize = 20
+        elif self.battery_voltage < 4.05:
+            self.windowSize = 15
+        elif self.battery_voltage < 4.15:
+            self.windowSize = 8
+        elif self.battery_voltage >= 4.15:
+            self.windowSize = 5
+        
+#         if self.battery_voltage >= 3.92:				## Reduce greater noise before 3.9 V with large SMA window
+#             self.windowSize = 30
+#         else:										## Less Noise beyond 3.9V so reduce SMA window
+#             self.windowSize = 60
     
     def BatteryVoltage_SMA(self):
 
@@ -50,12 +61,11 @@ class BatteryManager:
                 self.movingAvg.append(self.SMA_battery_voltage)
             else:
                 self.movingAvg.pop(0)
-            
-#         return self.SMA_battery_voltage
     
     def SOCtable(self):
-        VoltageRange = [2.8, 3.0, 3.1, 3.2, 3.3, 3.35, 3.4, 3.45, 3.50, 3.55, 3.6, 3.7, 3.75, 3.8, 3.9, 3.95, 4.0, 4.05, 4.1, 4.15, 4.2]
-        Percentage =   [  2,   5,   7,  10,  13,   15,  20,   25,   30,   35,  40,  50,   60,  65,  70,   75,  80,   85,  90,   95, 100]
+        VoltageRange = [2.8, 3.0, 3.1, 3.2, 3.3, 3.35, 3.4, 3.45, 3.50, 3.55, 3.6, 3.7, 3.75, 3.8, 3.9, 3.95, 4.0, 4.03, 4.05, 4.06, 4.07]
+        Percentage =   [  2,   5,   7,  10,  13,   15,  20,   25,   30,   35,  40,  50,   60,  65,  70,   75,  80,   85,  90,   98, 100]
+        print("SMA in SOC = " + str(self.SMA_battery_voltage))
         if (self.SMA_battery_voltage < 2.8):
             Index = 0
         elif (self.SMA_battery_voltage > 4.2) :

@@ -18,7 +18,6 @@ time.sleep(0.3)		## Allow for Boot time
 
 # Initialize I2C
 i2c = I2C(0, scl=Pin(1), sda=Pin(0))
-# print(i2c.scan())
 
 # Create display object (128x64 OLED at address 0x3C)
 oled = ssd1306.SSD1306_I2C(128, 64, i2c)
@@ -45,6 +44,7 @@ while True:
     BatteryMethods.BatteryVoltage_SMA()		## Use SMA to smoothen out the battery percentage
     
     battery_percentage = BatteryMethods.SOCtable()							## battery_percentage is an integer
+
     battery_percent_str = str(battery_percentage)
     
     BatteryMethods.Check_movingAvgArr()
