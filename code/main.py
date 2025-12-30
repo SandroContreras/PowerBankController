@@ -26,22 +26,11 @@ oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 ## Create ADC object on an ADC pin
 adc = ADC(Pin(26))	## GPIO 26 on Pico is an ADC0 Pin
 
-percentSymbol = "%"
 battery_percent_str = ""
-
-SMA_battery_voltage = 0
 previous_battery_percentage = 0
-battery_percentage = 0
-raw = 0
-adc_voltage = 0
-windowSize = 0
-movingAvg = []
-previous_SMA_battery_voltage = 0
-battery_voltage = 0
-BatteryVoltageArr = []
 
-BatteryMethods = BatteryManager(raw, adc_voltage, SMA_battery_voltage, movingAvg, battery_voltage, battery_percentage, BatteryVoltageArr, windowSize)
-OledMethods = OledUI(previous_SMA_battery_voltage, previous_battery_percentage, battery_percent_str, oled, battery_voltage, battery_percentage, raw, adc_voltage, BatteryVoltageArr, windowSize, SMA_battery_voltage)
+BatteryMethods = BatteryManager(adc)
+OledMethods = OledUI(oled)
 
 while True:
     
@@ -49,19 +38,19 @@ while True:
     
     time.sleep_ms(200)		# Add a delay between readings for comparison
 
-    battery_voltage = BatteryMethods.PowerCalculator()
+    BatteryMethods.PowerCalculator()
 
-    windowSize = BatteryMethods.SetWindowSize(battery_voltage)
+    BatteryMethods.SetWindowSize()
 
-    SMA_battery_voltage = BatteryMethods.BatteryVoltage_SMA(battery_voltage, windowSize)		## Use SMA to smoothen out the battery percentage
+    BatteryMethods.BatteryVoltage_SMA()		## Use SMA to smoothen out the battery percentage
     
-    battery_percentage = BatteryMethods.SOCtable(SMA_battery_voltage)							## battery_percentage is an integer
+    battery_percentage = BatteryMethods.SOCtable()							## battery_percentage is an integer
     battery_percent_str = str(battery_percentage)
     
-    movingAvgArrBool = BatteryMethods.Check_movingAvgArr(movingAvg)
+    BatteryMethods.Check_movingAvgArr()
     
-    OledMethods.OledSignal(previous_SMA_battery_voltage, percentSymbol, battery_voltage, previous_battery_percentage, battery_percent_str, BatteryVoltageArr, windowSize, SMA_battery_voltage, movingAvgArrBool)
+    OledMethods.OledSignal(BatteryMethods, previous_battery_percentage, battery_percent_str)
     
-    previous_SMA_battery_voltage = OledMethods.BatteryVoltageUpdater(previous_SMA_battery_voltage, SMA_battery_voltage)	# Update the lower bounds to avoid an always on state
+    previous_SMA_battery_voltage = OledMethods.BatteryVoltageUpdater(BatteryMethods)	# Update the lower bounds to avoid an always on state
     
     previous_battery_percentage = battery_percentage
