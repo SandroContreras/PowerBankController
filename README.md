@@ -33,7 +33,7 @@ This was my first time soldering. I quickly learned the soldering process throug
 <p align = "center"><em>High-Level Circuit Diagram.</em></p>
 
 <p align = "center">
-    <img src = "images/PowerBank_PCB_Schematic.svg" width = "100%" alt = "Portable Power Bank - PCB Circuit Diagram"
+    <img src = "images/PowerBank_PCB_Schematic.svg" width = "100%" alt = "Portable Power Bank - PCB Circuit Diagram">
 </p>
 <p align = "center"><em>PCB Circuit Diagram.</em></p>p> 
 
