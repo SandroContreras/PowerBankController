@@ -1,5 +1,5 @@
 # Power Bank Controller
-MicroPython code to control an OLED display that monitors battery health.
+Custom 8-cell lithium-ion power bank with embedded monitoring via MicroPython and OLED display.
 
 ## Overview
 This project is a custom 8-cell (8×18650) lithium-ion power bank controller designed to explore
@@ -25,11 +25,10 @@ Eight 18650 batteries are wired in parallel to a boost converter charging module
 - Chose IP5310 to simplify power-bank control while accepting uncertainty around USB-PD behavior.
 - Accepted larger PCB size to prioritize current handling and mechanical robustness.
 
-## Optimizations
-Will cover:
-- Improved wiring layout
-- Practical design refinements
-- Considerations for safety and reliability
+## Future Work
+- Improve wiring layout and enclosure integration
+- Perform basic electrical and thermal validation under load
+- Apply practical design refinements based on test results
 
 ## Lessons Learned
 This was my first time soldering. I quickly learned the soldering process through soldering the Battery Case Holders to the Charging Module. This project also taught me the importance of solder flux, both for creating clean joints and for desoldering.
