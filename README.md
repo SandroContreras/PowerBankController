@@ -35,7 +35,7 @@ This was my first time soldering. I quickly learned the soldering process throug
 <p align = "center">
     <img src = "images/PowerBank_PCB_Schematic.svg" width = "100%" alt = "Portable Power Bank - PCB Circuit Diagram">
 </p>
-<p align = "center"><em>PCB Circuit Diagram.</em></p>p> 
+<p align = "center"><em>PCB Circuit Diagram.</em></p> 
 
 ## Included Modules
 - 'bisect.py' - From the Python Standard Library (CPython 3.13)
