@@ -1,13 +1,29 @@
 # Power Bank Controller
 MicroPython code to control an OLED display that monitors battery health.
 
-**Link to Project Demo:** *Coming Soon*
-*(This project is a work in progress)*
+## Overview
+This project is a custom 8-cell (8×18650) lithium-ion power bank controller designed to explore
+high-current PCB design, USB-C power delivery behavior, and real-world manufacturing constraints.
+The board was designed in KiCad and fabricated as a 2-oz copper PCB.
+
+## Features
+- 8× Sony/Murata VTC6 18650 cells in parallel (~86 Wh)
+- USB-C power output via IP5310 power-bank SoC
+- 2 oz copper PCB for high-current paths
+- Per-cell polyfuse protection
+- Raspberry Pi Pico for battery monitoring
+- Designed for serviceable, replaceable cells
 
 ## How It's Made
 **Tech Used:** MicroPython, Raspberry Pi Pico, SSD1306 OLED Display
 
 Eight 18650 batteries are wired in parallel to a boost converter charging module. The charging module powers the Pico Board and the OLED Display. To achieve battery health displays a voltage divider is used to safely bring down the voltage towards an ADC pin. The display is programmed to display the reported battery health percentage for the user. 
+
+## Design Decisions & Tradeoffs
+- Used 18650 holders instead of spot-welded packs to improve safety and serviceability.
+- Selected 2 oz copper to reduce voltage drop and thermal stress in high-current paths.
+- Chose IP5310 to simplify power-bank control while accepting uncertainty around USB-PD behavior.
+- Accepted larger PCB size to prioritize current handling and mechanical robustness.
 
 ## Optimizations
 Will cover:
