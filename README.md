@@ -28,9 +28,14 @@ This was my first time soldering. I quickly learned the soldering process throug
 ## Circuit Diagram
 
 <p align = "center">
-    <img src = "images/PortablePowerBank.svg" width = "100%" alt = Portable Power Bank - Circuit Diagram">
+    <img src = "images/PortablePowerBank.svg" width = "100%" alt = "Portable Power Bank - High-Level Circuit Diagram">
 </p>
-<p align = "center"><em>High-Level wiring diagram for the Portable Power Bank project.</em></p>
+<p align = "center"><em>High-Level Circuit Diagram.</em></p>
+
+<p align = "center">
+    <img src = "images/PowerBank_PCB_Schematic.svg" width = "100%" alt = "Portable Power Bank - PCB Circuit Diagram"
+</p>
+<p align = "center"><em>PCB Circuit Diagram.</em></p>p> 
 
 ## Included Modules
 - 'bisect.py' - From the Python Standard Library (CPython 3.13)
