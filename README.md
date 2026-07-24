@@ -36,9 +36,12 @@ Eight 18650 batteries are wired in parallel to a boost converter charging module
 <br><br>
 
 ## Future Work
-- Improve wiring layout and enclosure integration
-- Perform basic electrical and thermal validation under load
-- Apply practical design refinements based on test results
+- Assemble and electrically validate the V1 prototype.
+- Verify USB-C charging, 5 V boost output, OLED operation, and Raspberry Pi Pico functionality.
+- Perform electrical and thermal testing under sustained load.
+- Measure boost converter efficiency and battery runtime with the final 8-cell LG MJ1 battery pack.
+- Design and fabricate a custom enclosure suitable for camping use.
+- Evaluate the need for a V2 PCB revision based on functional and thermal test results.
 
 <br><br>
 
