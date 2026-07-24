@@ -33,12 +33,14 @@ Eight 18650 batteries are wired in parallel to a boost converter charging module
 - Chose IP5310 to simplify power-bank control while accepting uncertainty around USB-PD behavior.
 - Accepted larger PCB size to prioritize current handling and mechanical robustness.
 
-<br><br><br><br>
+<br><br>
 
 ## Future Work
 - Improve wiring layout and enclosure integration
 - Perform basic electrical and thermal validation under load
 - Apply practical design refinements based on test results
+
+<br><br>
 
 ## Data Flow
 
