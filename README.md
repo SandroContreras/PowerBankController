@@ -8,7 +8,7 @@ This project is a custom 8-cell (8×18650) lithium-ion power bank controller des
 high-current PCB design, USB-C power delivery behavior, and real-world manufacturing constraints.
 The board was designed in KiCad and fabricated as a 2-oz copper PCB.
 
-<br><br>
+<br>
 
 ## Features
 - 8× LG MJ1 cells in parallel (~100.8 Wh)
@@ -18,7 +18,7 @@ The board was designed in KiCad and fabricated as a 2-oz copper PCB.
 - Raspberry Pi Pico for battery monitoring
 - Designed for serviceable, replaceable cells
 
-<br><br><br><br>
+<br><br>
 
 ## How It's Made
 **Tech Used:** MicroPython, Raspberry Pi Pico, SSD1306 OLED Display
