@@ -1,6 +1,6 @@
 # Power Bank Controller
 Custom 8-cell lithium-ion power bank with embedded monitoring via MicroPython and OLED display.
-<br>
+<br><br>
 **Project Status: PCB revision 1 ordered; assembly and electrical validation pending.**
 <br>
 ## Overview
