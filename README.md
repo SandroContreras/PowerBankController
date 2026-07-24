@@ -1,15 +1,14 @@
 # Power Bank Controller
 Custom 8-cell lithium-ion power bank with embedded monitoring via MicroPython and OLED display.
-
+<br>
 **Project Status: PCB revision 1 ordered; assembly and electrical validation pending.**
-
 <br>
 ## Overview
 This project is a custom 8-cell (8×18650) lithium-ion power bank controller designed to explore
 high-current PCB design, USB-C power delivery behavior, and real-world manufacturing constraints.
 The board was designed in KiCad and fabricated as a 2-oz copper PCB.
 
-<br><br><br><br>
+<br><br>
 
 ## Features
 - 8× LG MJ1 cells in parallel (~100.8 Wh)
