@@ -1,13 +1,16 @@
 # Power Bank Controller
 Custom 8-cell lithium-ion power bank with embedded monitoring via MicroPython and OLED display.
 
+## Project Status: PCB revision 1 ordered; assembly and electrical validation pending.
+
+
 ## Overview
 This project is a custom 8-cell (8×18650) lithium-ion power bank controller designed to explore
 high-current PCB design, USB-C power delivery behavior, and real-world manufacturing constraints.
 The board was designed in KiCad and fabricated as a 2-oz copper PCB.
 
 ## Features
-- 8× Sony/Murata VTC6 18650 cells in parallel (~86 Wh)
+- 8× LG MJ1 cells in parallel (~100.8 Wh)
 - USB-C power output via IP5310 power-bank SoC
 - 2 oz copper PCB for high-current paths
 - Per-cell polyfuse protection
@@ -30,9 +33,6 @@ Eight 18650 batteries are wired in parallel to a boost converter charging module
 - Perform basic electrical and thermal validation under load
 - Apply practical design refinements based on test results
 
-## Lessons Learned
-This was my first time soldering. I quickly learned the soldering process through soldering the Battery Case Holders to the Charging Module. This project also taught me the importance of solder flux, both for creating clean joints and for desoldering.
-
 ## Data Flow
 
 <p align="center">
@@ -51,6 +51,14 @@ This was my first time soldering. I quickly learned the soldering process throug
     <img src = "images/PowerBank_PCB_Schematic.svg" width = "100%" alt = "Portable Power Bank - PCB Circuit Diagram">
 </p>
 <p align = "center"><em>PCB Circuit Diagram.</em></p> 
+
+
+## Lessons Learned
+This project was my first complete custom PCB, from schematic capture through PCB layout, manufacturing, and assembly. Along the way I learned several practical engineering lessons:
+    - The importance of verifying component footprints, pinouts, and manufacturer datasheets before ordering parts.
+    - How PCB stack-up, copper pours, via placement, and trace widths affect power distribution and thermal performance.
+    - The value of building a complete BOM and selecting components based on both electrical requirements and long-term serviceability.
+    - That designing a functional hardware system often requires multiple design reviews and may require more than one PCB revision before reaching a mature design.
 
 ## Included Modules
 - 'bisect.py' - From the Python Standard Library (CPython 3.13)
