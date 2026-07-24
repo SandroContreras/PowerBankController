@@ -52,10 +52,7 @@ Eight 18650 batteries are wired in parallel to a boost converter charging module
 </p>
 <p align = "center"><em>PCB Circuit Diagram.</em></p> 
 
-
-
-
-
+<br><br>
 
 ## Lessons Learned
 This project was my first complete custom PCB, from schematic capture through PCB layout, manufacturing, and assembly. Along the way I learned several practical engineering lessons:
