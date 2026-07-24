@@ -49,6 +49,8 @@ Eight 18650 batteries are wired in parallel to a boost converter charging module
 </p>
 <p align="center"><em>Data flow from ADC voltage reading to OLED UI output.</em></p>
 
+<br><br>
+
 ## Circuit Diagram
 
 <p align = "center">
