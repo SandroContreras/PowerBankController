@@ -63,7 +63,7 @@ Eight 18650 batteries are wired in parallel to a boost converter charging module
 </p>
 <p align = "center"><em>PCB Circuit Diagram.</em></p> 
 
-<br><br><br><br>
+<br><br><br>
 
 ## Lessons Learned
 This project was my first complete custom PCB, from schematic capture through PCB layout, manufacturing, and assembly. Along the way I learned several practical engineering lessons:
@@ -72,7 +72,7 @@ This project was my first complete custom PCB, from schematic capture through PC
     - The value of building a complete BOM and selecting components based on both electrical requirements and long-term serviceability.
     - That designing a functional hardware system often requires multiple design reviews and may require more than one PCB revision before reaching a mature design.
 
-<br><br><br><br>
+<br><br><br>
 
 ## Included Modules
 - 'bisect.py' - From the Python Standard Library (CPython 3.13)
