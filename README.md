@@ -18,14 +18,14 @@ The board was designed in KiCad and fabricated as a 2-oz copper PCB.
 - Raspberry Pi Pico for battery monitoring
 - Designed for serviceable, replaceable cells
 
-<br><br>
+<br>
 
 ## How It's Made
 **Tech Used:** MicroPython, Raspberry Pi Pico, SSD1306 OLED Display
 <br>
 Eight 18650 batteries are wired in parallel to a boost converter charging module. The charging module powers the Pico Board and the OLED Display. To achieve battery health displays a voltage divider is used to safely bring down the voltage towards an ADC pin. The display is programmed to display the reported battery health percentage for the user. 
 
-<br><br><br><br>
+<br><br>
 
 ## Design Decisions & Tradeoffs
 - Used 18650 holders instead of spot-welded packs to improve safety and serviceability.
